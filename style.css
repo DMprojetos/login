@@ -123,3 +123,28 @@ h1 {
 .register-link p a:hover {
     text-decoration: underline;
 }
+
+.login-link p  {
+    font-size: 16px;
+    color: #fff;
+    font-weight: 500 ;
+
+}
+
+.login-link {
+    text-align: center;
+    margin: 20px 0;
+
+}
+
+.login-link p a {
+    font-size: 16px;
+    color: #fff;
+    font-weight: 700 ;
+    text-decoration: none;
+
+}
+
+.login-link p a:hover {
+    text-decoration: underline;
+}
