@@ -14,7 +14,7 @@ if ($conn->connect_error) {
 }
 
 // Receber os dados do formulário e sanitizá-los
-$email = $conn->real_escape_string($_POST['email']); // Sanitiza a entrada do email
+$email = $conn->real_escape_string(trim($_POST['email'])); // Sanitiza a entrada do email
 $senha = $_POST['senha']; // Obtém a entrada da senha
 
 // Preparar a consulta SQL para verificar o usuário
