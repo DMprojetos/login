@@ -13,29 +13,40 @@ if ($conn->connect_error) {
     die("Conexão falhou: " . $conn->connect_error);
 }
 
-// Receber os dados do formulário
-$nome = $_POST['nome'];
-$email = $_POST['email'];
+// Receber os dados do formulário e sanitizá-los
+$nome = $conn->real_escape_string($_POST['nome']);
+$email = $conn->real_escape_string($_POST['email']);
 $senha = $_POST['senha'];
 $confirmar_senha = $_POST['confirmar_senha'];
 
 // Verificar se as senhas coincidem
 if ($senha !== $confirmar_senha) {
-    die("As senhas não coincidem!");
+    echo "<script>alert('As senhas não coincidem!'); window.history.back();</script>";
+    exit;
 }
 
-// Criptografar a senha
-$senha_criptografada = password_hash($senha, PASSWORD_DEFAULT);
+// Verificar se o email já está cadastrado
+$email_verificado = $conn->query("SELECT * FROM usuarios WHERE email='$email'");
 
-// Inserir os dados no banco de dados
-$sql = "INSERT INTO usuarios (nome, email, senha) VALUES ('$nome', '$email', '$senha_criptografada')";
+if ($email_verificado->num_rows > 0) {
+    die("Este email já está cadastrado!");
+}
 
-if ($conn->query($sql) === TRUE) {
+// **ARMAZENANDO A SENHA EM TEXTO CLARO** - Cuidado com isso!
+$senha_armazenada = $senha; // Armazenando a senha sem criptografia
+
+// Preparar a consulta SQL
+$stmt = $conn->prepare("INSERT INTO usuarios (nome, email, senha) VALUES (?, ?, ?)");
+$stmt->bind_param("sss", $nome, $email, $senha_armazenada);
+
+// Executar a consulta
+if ($stmt->execute()) {
     echo "Cadastro realizado com sucesso!";
 } else {
-    echo "Erro: " . $sql . "<br>" . $conn->error;
+    echo "Erro ao cadastrar: " . $stmt->error;
 }
 
 // Fechar a conexão
+$stmt->close();
 $conn->close();
 ?>
