@@ -106,17 +106,7 @@ h1 {
 
 }
 
-.input-container button {
-    position: absolute;
-    right: 50px;
-    top: 50%;
-    transform: translateY(-50%);
-    background: none;
-    border: none;
-    color: #fff;
-    cursor: pointer;
-    font-size: 16px; /* Tamanho do ícone do botão */
-}
+
 
 .register-link {
     text-align: center;
@@ -160,5 +150,3 @@ h1 {
 .login-link p a:hover {
     text-decoration: underline;
 }
-
-

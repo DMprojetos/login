@@ -9,6 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
     <title>Tela de Cadastro</title>
+
 </head>
 
 <body>
@@ -18,7 +19,7 @@
 
             <div class="input-container">
                 <input name="nome" placeholder="Nome Completo" type="text" required>
-                <img width="20" height="20" src="https://img.icons8.com/ios/50/user--v1.png" alt="user--v1" />
+                <img width="20" height="20" src="https://img.icons8.com/ios/50/user--v1.png" alt="user-icon" />
             </div>
 
             <div class="input-container">
@@ -28,14 +29,15 @@
 
             <div class="input-container">
                 <input id="senha" name="senha" placeholder="Senha" type="password" required>
-                <img width="20" height="20" src="https://img.icons8.com/ios/50/lock--v1.png" alt="lock--v1" />
-                <button type="button" class="toggle-password" onclick="togglePassword('senha')">👁️</button>
+                
+                <img class="input-tog" width="25" height="25" src="https://img.icons8.com/ios/50/visible.png" alt="toggle-senha" onclick="toggleSenha()" />
             </div>
 
             <div class="input-container">
-                <input id="confirmar_senha" name="confirmar_senha" placeholder="Confirmar Senha" type="password" required>
-                <img width="20" height="20" src="https://img.icons8.com/ios/50/lock--v1.png" alt="lock--v1" />
-                <button type="button" class="toggle-password" onclick="togglePassword('confirmar_senha')">👁️</button>
+                <input id="confirmar_senha" name="confirmar_senha" placeholder="Confirmar Senha" type="password"
+                    required>
+                
+                <img class="input-tog" width="25" height="25" src="https://img.icons8.com/ios/50/visible.png" alt="toggle-confirmar-senha" onclick="toggleConfirmarSenha()" />
             </div>
 
             <button type="submit" class="submi-button">Cadastrar</button>
@@ -46,16 +48,21 @@
         </form>
     </div>
 
-    <script>
-        function togglePassword(id) {
-            const passwordInput = document.getElementById(id);
-            if (passwordInput.type === "password") {
-                passwordInput.type = "text"; // Muda o tipo para texto
-            } else {
-                passwordInput.type = "password"; // Muda de volta para password
+    <div >
+        <script>
+            function toggleSenha() {
+                const senhaInput = document.getElementById("senha");
+                senhaInput.type = senhaInput.type === "password" ? "text" : "password";
             }
-        }
-    </script>
+    
+            function toggleConfirmarSenha() {
+                const confirmarSenhaInput = document.getElementById("confirmar_senha");
+                confirmarSenhaInput.type = confirmarSenhaInput.type === "password" ? "text" : "password";
+            }
+        </script>
+
+
+    </div>
 </body>
 
 </html>
