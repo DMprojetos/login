@@ -27,13 +27,15 @@
             </div>
 
             <div class="input-container">
-                <input name="senha" placeholder="Senha" type="password" required>
+                <input id="senha" name="senha" placeholder="Senha" type="password" required>
                 <img width="20" height="20" src="https://img.icons8.com/ios/50/lock--v1.png" alt="lock--v1" />
+                <button type="button" class="toggle-password" onclick="togglePassword('senha')">👁️</button>
             </div>
 
             <div class="input-container">
-                <input name="confirmar_senha" placeholder="Confirmar Senha" type="password" required>
+                <input id="confirmar_senha" name="confirmar_senha" placeholder="Confirmar Senha" type="password" required>
                 <img width="20" height="20" src="https://img.icons8.com/ios/50/lock--v1.png" alt="lock--v1" />
+                <button type="button" class="toggle-password" onclick="togglePassword('confirmar_senha')">👁️</button>
             </div>
 
             <button type="submit" class="submi-button">Cadastrar</button>
@@ -43,6 +45,17 @@
             </div>
         </form>
     </div>
+
+    <script>
+        function togglePassword(id) {
+            const passwordInput = document.getElementById(id);
+            if (passwordInput.type === "password") {
+                passwordInput.type = "text"; // Muda o tipo para texto
+            } else {
+                passwordInput.type = "password"; // Muda de volta para password
+            }
+        }
+    </script>
 </body>
 
 </html>
