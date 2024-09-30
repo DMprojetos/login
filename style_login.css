@@ -150,3 +150,47 @@ h1 {
 .login-link p a:hover {
     text-decoration: underline;
 }
+
+
+
+body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa; /* Fundo suave */
+            display: flex;
+            justify-content: flex-end; /* Alinha o menu à direita */
+            padding: 20px; /* Adiciona um pouco de espaço */
+        }
+        .user-menu {
+            position: relative; /* Necessário para o menu suspenso */
+            cursor: pointer;
+            text-align: center; /* Centraliza o texto e a imagem */
+        }
+        .menu-content {
+            display: none; /* Inicialmente oculto */
+            position: absolute; /* Fica em relação ao menu do usuário */
+            right: 0;
+            top: 40px; /* Ajusta a posição do menu suspenso */
+            background-color: white; /* Fundo branco para o menu */
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Sombra para o menu */
+            border-radius: 5px; /* Bordas arredondadas */
+            z-index: 1000; /* Coloca o menu acima de outros elementos */
+        }
+        .menu-content a {
+            display: block; /* Faz os links ocuparem toda a largura */
+            padding: 10px 20px; /* Espaço em torno do texto */
+            color: #333; /* Cor do texto */
+            text-decoration: none; /* Remove o sublinhado */
+        }
+        .menu-content a:hover {
+            background-color: #f0f0f0; /* Cor de fundo ao passar o mouse */
+        }
+        .user-name {
+            color: rgb(0, 0, 0);
+            margin-top: 5px; /* Espaço entre o nome e a imagem */
+        }
+        img {
+            display: block; /* Garante que a imagem fique centralizada */
+            margin: 0 auto; /* Centraliza a imagem */
+        }

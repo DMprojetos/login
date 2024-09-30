@@ -42,6 +42,7 @@ $stmt->bind_param("sss", $nome, $email, $senha_armazenada);
 // Executar a consulta
 if ($stmt->execute()) {
     echo "Cadastro realizado com sucesso!";
+    header('Location: index.php');
 } else {
     echo "Erro ao cadastrar: " . $stmt->error;
 }

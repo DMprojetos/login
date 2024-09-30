@@ -33,6 +33,9 @@ $result = $conn->query($sql);
     // Senha correta, o login é bem-sucedido
     echo "Login realizado com sucesso! Bem-vindo, " . $user['nome'] . ".";
 
+    // Armazenar o nome do usuário na sessão
+    $_SESSION['usuario_nome'] = $user['nome'];
+
     // Redirecionar para a página de agendamento
     header('Location: index.php');
     exit(); // Sempre use exit() após o header para garantir que o script pare aqui
