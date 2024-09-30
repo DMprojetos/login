@@ -21,29 +21,28 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $nome = isset($_POST['nome']) ? $_POST['nome'] : ''; // Capturando o nome
     $dia = isset($_POST['dia']) ? $_POST['dia'] : '';
     $horario = isset($_POST['horario']) ? $_POST['horario'] : '';
-    $periodo = isset($_POST['periodo']) ? $_POST['periodo'] : ''; // Capturando o periodo
+    $profissional = isset($_POST['Profissional']) ? $_POST['Profissional'] : '';
 
-    // Sanitiza os dados
-    $nome = $conn->real_escape_string($nome);
-    $dia = $conn->real_escape_string($dia);
-    $horario = $conn->real_escape_string($horario);
-    $periodo = $conn->real_escape_string($periodo);
-
-    // Prepara a consulta SQL para inserir os dados
-    $stmt = $conn->prepare("INSERT INTO agendamentos (nome, dia, periodo, horario) VALUES (?, ?, ?, ?)");
-    $stmt->bind_param("ssss", $nome, $dia, $periodo, $horario); // "ssss" indica que todas as variáveis são strings
-
-    // Executa a consulta
-    if ($stmt->execute()) {
-        echo "<div class='message'>Agendamento realizado com sucesso!</div>";
-    } else {
-        echo "<div class='message'>Erro: " . $stmt->error . "</div>";
+    // Verifica se os campos estão vazios
+    if (empty($nome) || empty($dia) || empty($horario) || empty($profissional)) {
+        echo "Todos os campos são obrigatórios!";
+        exit;
     }
 
-    // Fecha a declaração
+    // Prepara a instrução SQL
+    $stmt = $conn->prepare("INSERT INTO agendamentos (nome, dia, horario, profissional) VALUES (?, ?, ?, ?)");
+    $stmt->bind_param("ssss", $nome, $dia, $horario, $profissional);
+
+    // Executa a inserção e verifica
+    if ($stmt->execute()) {
+        echo "Agendamento realizado com sucesso!";
+    } else {
+        echo "Erro ao agendar: " . $stmt->error;
+    }
+
+    // Fecha a declaração e a conexão
     $stmt->close();
 }
 
-// Fecha a conexão
 $conn->close();
 ?>
