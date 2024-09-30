@@ -24,20 +24,23 @@ $email = $conn->real_escape_string($email);
 $sql = "SELECT * FROM usuarios WHERE email='$email'";
 $result = $conn->query($sql);
 
-if ($result->num_rows > 0) {
+  if ($result->num_rows > 0) {
     // O email foi encontrado
     $user = $result->fetch_assoc();
     
     // Verificar se a senha está correta
-    if ($user['senha'] === $senha) {
-        // Senha correta, o login é bem-sucedido
-        echo "Login realizado com sucesso! Bem-vindo, " . $user['nome'] . ".";
-        
-        // Você pode redirecionar para outra página aqui usando header('Location: outra_pagina.php');
+   if ($user['senha'] === $senha) {
+    // Senha correta, o login é bem-sucedido
+    echo "Login realizado com sucesso! Bem-vindo, " . $user['nome'] . ".";
+
+    // Redirecionar para a página de agendamento
+    header('Location: agendamento.php');
+    exit(); // Sempre use exit() após o header para garantir que o script pare aqui
     } else {
-        // Senha incorreta
-        echo "Senha incorreta!";
-    }
+    // Senha incorreta
+    echo "Senha incorreta!";
+}
+
 } else {
     // Email não encontrado
     echo "Email não encontrado!";

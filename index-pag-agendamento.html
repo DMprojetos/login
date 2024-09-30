@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agendamento</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        :root {
+            --bg-color: #fff;
+            --day-bg-color: #2D2D2D;
+            --active-day-color: #FEC810;
+            --time-bg-color: #2D2D2D;
+            --time-hover-color: #FEC810;
+            --confirm-bg-color: #FEC810;
+            --confirm-hover-color: #E0B000;
+            --text-color: #ffffff;
+            --info-bg-color: #2D2D2D;
+        }
+
+        .message {
+          font-size: 20px; /* Tamanho da fonte */
+          color: #FEC810; /* Cor do texto */
+          text-align: center; /* Centraliza o texto */
+          margin: 20px 0; /* Margem em cima e embaixo */
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+        }
+
+        .container {
+            width: 90%;
+            max-width: 400px;
+            margin: 50px auto;
+            text-align: center;
+        }
+
+        .days-selection {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .day {
+            background-color: var(--day-bg-color);
+            padding: 10px;
+            border-radius: 10px;
+            width: calc(33.33% - 10px);
+            text-align: center;
+            cursor: pointer;
+            margin-bottom: 10px; /* Espaço entre linhas de dias */
+        }
+
+        .day.active {
+            background-color: var(--active-day-color);
+        }
+
+        .day p {
+            margin: 3px 0;
+            font-size: 13px;
+        }
+
+        h2 {
+            margin: 15px 0;
+            font-size: 14px; /* Aumentando um pouco o tamanho da fonte do título */
+        }
+
+        .info {
+            font-size: 14px;
+            background-color: var(--info-bg-color);
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .time-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); /* Adapta os botões ao tamanho */
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .time-btn {
+            background-color: var(--time-bg-color);
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            font-size: 14px; /* Padronizando o tamanho da fonte */
+        }
+
+        .time-btn.active {
+            background-color: var(--active-day-color);
+        }
+
+        .time-btn:hover {
+            background-color: var(--time-hover-color);
+        }
+
+        .confirm-btn {
+            background-color: var(--confirm-bg-color);
+            color: black;
+            border: none;
+            padding: 15px;
+            width: 100%;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .confirm-btn:hover {
+            background-color: var(--confirm-hover-color);
+        }
+
+        .summary {
+            margin-top: 20px;
+            color: #000000;
+            padding: 10px;
+            border: 1px solid #000000;
+        }
+
+        @media (max-width: 400px) {
+            .day {
+                width: calc(50% - 5px); /* Reduzindo a largura em telas menores */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <form action="config.php" method="POST" id="agendamentoForm">
+            <div class="days-selection" id="daysSelection"></div>
+
+            <h2>Escolha o melhor horário</h2>
+            <p class="info">Os agendamentos devem ser realizados com pelo menos 30 minutos de antecedência.</p>
+
+            <div class="time-grid">
+                <button type="button" class="time-btn" data-horario="09:00">09:00</button>
+                <button type="button" class="time-btn" data-horario="10:00">10:00</button>
+                <button type="button" class="time-btn" data-horario="11:00">11:00</button>
+                <button type="button" class="time-btn" data-horario="12:00">12:00</button>
+                <button type="button" class="time-btn" data-horario="12:30">12:30</button>
+                <button type="button" class="time-btn" data-horario="13:00">13:00</button>
+                <button type="button" class="time-btn" data-horario="13:30">13:30</button>
+                <button type="button" class="time-btn" data-horario="14:00">14:00</button>
+                <button type="button" class="time-btn" data-horario="15:00">15:00</button>
+                <button type="button" class="time-btn" data-horario="16:00">16:00</button>
+                <button type="button" class="time-btn" data-horario="17:00">17:00</button>
+                <button type="button" class="time-btn" data-horario="18:00">18:00</button>
+                <button type="button" class="time-btn" data-horario="19:00">19:00</button>
+            </div>
+
+            <input type="hidden" name="dia" id="inputDia" value="02/10/2024">
+            <input type="hidden" name="horario" id="inputHorario" value="09:05">
+
+            <button type="submit" class="confirm-btn">Confirmar agendamento</button>
+        </form>
+
+        <div class="summary" id="summary">
+            <h3>Resumo do Agendamento:</h3>
+            <p>Dia: <span id="diaSelecionado">02/10/2024</span></p>
+            <p>Horário: <span id="horarioSelecionado">09:05</span></p>
+        </div>
+    </div>
+
+    <script>
+        // Função para formatar a data
+        function formatDate(date) {
+            const options = { year: 'numeric', month: '2-digit', day: '2-digit', weekday: 'short' };
+            return date.toLocaleDateString('pt-BR', options).replace(',', '').replace('.', ''); // Remove o ponto final
+        }
+
+        // Gera os dias a partir da data atual, excluindo o domingo
+        const daysSelection = document.getElementById('daysSelection');
+        const today = new Date();
+
+        for (let i = 0; i < 7; i++) {
+            const nextDate = new Date(today);
+            nextDate.setDate(today.getDate() + i);
+            if (nextDate.getDay() === 0) continue; // Ignora o domingo
+            const formattedDate = formatDate(nextDate);
+            const dayElement = document.createElement('div');
+            dayElement.className = 'day' + (i === 0 ? ' active' : '');
+            dayElement.dataset.dia = formattedDate;
+            dayElement.innerHTML = `<p>${formattedDate.split(' ')[0]}</p>`;
+            daysSelection.appendChild(dayElement);
+        }
+
+        function updateField(selector, field, value, summaryId) {
+            const activeElement = document.querySelector(selector);
+            if (activeElement) {
+                activeElement.classList.remove('active');
+            }
+            field.classList.add('active');
+            const selectedValue = field.dataset.dia || field.dataset.horario;
+            document.getElementById('input' + value.charAt(0).toUpperCase() + value.slice(1)).value = selectedValue;
+            document.getElementById(summaryId).textContent = selectedValue;
+        }
+
+        // Atualiza o dia selecionado
+        document.querySelectorAll('.day').forEach(day => {
+            day.addEventListener('click', () => updateField('.day.active', day, 'dia', 'diaSelecionado'));
+        });
+
+        // Atualiza o horário selecionado
+        document.querySelectorAll('.time-btn').forEach(timeBtn => {
+            timeBtn.addEventListener('click', () => {
+                document.querySelectorAll('.time-btn').forEach(btn => btn.classList.remove('active'));
+                timeBtn.classList.add('active');
+                const horarioValue = timeBtn.dataset.horario;
+                document.getElementById('inputHorario').value = horarioValue;
+                document.getElementById('horarioSelecionado').textContent = horarioValue;
+            });
+        });
+    </script>
+</body>
+</html>
