@@ -282,38 +282,40 @@
 
 <script>
 
-    document.querySelectorAll('.time-btn').forEach(button => {
-        button.addEventListener('click', function () {
-            const dia = document.getElementById('inputDia').value;
-            const horario = this.getAttribute('data-horario');
+document.querySelectorAll('.time-btn').forEach(button => {
+    button.addEventListener('click', function () {
+        const dia = document.getElementById('inputDia').value;
+        const horario = this.getAttribute('data-horario');
+        const profissional = document.getElementById('inputProfissional').value; // Adicionando o profissional
 
-            // Atualiza o campo oculto com o horário selecionado
-            document.getElementById('inputHorario').value = horario;
+        // Atualiza o campo oculto com o horário selecionado
+        document.getElementById('inputHorario').value = horario;
 
-            // Faz uma requisição AJAX para verificar se o horário está disponível
-            fetch('verificar_agendamento.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: `dia=${dia}&horario=${horario}`
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.status === 'ocupado') {
-                        alert('Este horário já está ocupado. Por favor, escolha outro horário.');
-                        // Desmarcar o botão ativo
-                        button.classList.remove('active');
-                    } else {
-                        // Marcar o botão como ativo se o horário estiver disponível
-                        document.querySelectorAll('.time-btn').forEach(btn => btn.classList.remove('active'));
-                        button.classList.add('active');
-                        updateSummary(); // Atualiza o resumo do agendamento
-                    }
-                })
-                .catch(error => console.error('Erro ao verificar agendamento:', error));
-        });
+        // Faz uma requisição AJAX para verificar se o horário está disponível
+        fetch('verificar_agendamento.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: `dia=${encodeURIComponent(dia)}&horario=${encodeURIComponent(horario)}&Profissional=${encodeURIComponent(profissional)}`
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'ocupado') {
+                alert('Este horário já está ocupado. Por favor, escolha outro horário.');
+                // Desmarcar o botão ativo
+                button.classList.remove('active');
+            } else {
+                // Marcar o botão como ativo se o horário estiver disponível
+                document.querySelectorAll('.time-btn').forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+                updateSummary(); // Atualiza o resumo do agendamento
+            }
+        })
+        .catch(error => console.error('Erro ao verificar agendamento:', error));
     });
+});
+
 
 
 

@@ -31,7 +31,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // Prepara a instrução SQL
     $stmt = $conn->prepare("INSERT INTO agendamentos (nome, dia, horario, profissional) VALUES (?, ?, ?, ?)");
-    $stmt->bind_param("ssss", $nome, $dia, $horario, $profissional);
+    $profissional = isset($_POST['Profissional']) ? $_POST['Profissional'] : '';
 
     // Executa a inserção e verifica
     if ($stmt->execute()) {
