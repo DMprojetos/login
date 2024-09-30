@@ -279,54 +279,16 @@
         inputNome.addEventListener('input', updateSummary);
     </script>
 </body>
+
 <script>
-    // Função para formatar a data
-    function formatDate(date) {
-        const weekdays = ['dom', 'seg', 'ter', 'qua', 'qui', 'sex', 'sab'];
-        return weekdays[date.getDay()]; // Retorna a sigla do dia da semana
-    }
 
-    // Gera os dias a partir da data atual, excluindo o domingo
-    const daysSelection = document.getElementById('daysSelection');
-    const today = new Date();
-
-    for (let i = 0; i < 7; i++) {
-        const nextDate = new Date(today);
-        nextDate.setDate(today.getDate() + i);
-        if (nextDate.getDay() === 0) continue; // Ignora o domingo
-        const formattedDate = formatDate(nextDate);
-        const dayElement = document.createElement('div');
-        dayElement.className = 'day';
-        dayElement.innerHTML = `<p>${formattedDate}</p>`;
-        dayElement.setAttribute('data-date', nextDate.toISOString().split('T')[0]);
-        dayElement.addEventListener('click', () => {
-            document.querySelectorAll('.day').forEach(d => d.classList.remove('active'));
-            dayElement.classList.add('active');
-            document.getElementById('inputDia').value = nextDate.toISOString().split('T')[0];
-            updateSummary();
-        });
-        daysSelection.appendChild(dayElement);
-    }
-
-    const timeButtons = document.querySelectorAll('.time-btn');
-    const summary = document.getElementById('summary');
-    const inputNome = document.getElementById('inputNome');
-    const inputProfissional = document.getElementById('inputProfissional');
-
-    // Atualiza o resumo do agendamento
-    function updateSummary() {
-        document.getElementById('nomeSelecionado').innerText = inputNome.value || 'Não informado';
-        document.getElementById('profissionalSelecionado').innerText = inputProfissional.value || 'Não informado';
-        document.getElementById('diaSelecionado').innerText = document.getElementById('inputDia').value || 'Não informado';
-        document.getElementById('horarioSelecionado').innerText = document.getElementById('inputHorario').value || 'Não informado';
-    }
-
-    // Seleciona um horário
-    timeButtons.forEach(button => {
-        button.addEventListener('click', () => {
+    document.querySelectorAll('.time-btn').forEach(button => {
+        button.addEventListener('click', function () {
             const dia = document.getElementById('inputDia').value;
-            const horario = button.getAttribute('data-horario');
-            const funcionario = inputProfissional.value;
+            const horario = this.getAttribute('data-horario');
+
+            // Atualiza o campo oculto com o horário selecionado
+            document.getElementById('inputHorario').value = horario;
 
             // Faz uma requisição AJAX para verificar se o horário está disponível
             fetch('verificar_agendamento.php', {
@@ -334,78 +296,29 @@
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
                 },
-                body: `dia=${dia}&horario=${horario}&funcionario=${funcionario}`
+                body: `dia=${dia}&horario=${horario}`
             })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'ocupado') {
-                    alert('Este horário já está ocupado para este funcionário. Por favor, escolha outro horário ou funcionário.');
-                    // Desmarcar o botão ativo
-                    button.classList.remove('active');
-                } else {
-                    // Marca o botão como ativo se o horário estiver disponível
-                    document.querySelectorAll('.time-btn').forEach(btn => btn.classList.remove('active'));
-                    button.classList.add('active');
-                    document.getElementById('inputHorario').value = horario;
-                    updateSummary();
-                }
-            })
-            .catch(error => {
-                console.error('Erro ao verificar o agendamento:', error);
-            });
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'ocupado') {
+                        alert('Este horário já está ocupado. Por favor, escolha outro horário.');
+                        // Desmarcar o botão ativo
+                        button.classList.remove('active');
+                    } else {
+                        // Marcar o botão como ativo se o horário estiver disponível
+                        document.querySelectorAll('.time-btn').forEach(btn => btn.classList.remove('active'));
+                        button.classList.add('active');
+                        updateSummary(); // Atualiza o resumo do agendamento
+                    }
+                })
+                .catch(error => console.error('Erro ao verificar agendamento:', error));
         });
     });
 
-    // Seleciona um profissional
-    document.querySelectorAll('.barbeiro .time-btn').forEach(button => {
-        button.addEventListener('click', () => {
-            document.querySelectorAll('.barbeiro .time-btn').forEach(btn => btn.classList.remove('active'));
-            button.classList.add('active');
-            const profissional = button.getAttribute('data-profissional');
-            inputProfissional.value = profissional;
-            document.getElementById('profissionalSelecionado').innerText = profissional;
-        });
-    });
 
-    // Atualiza o nome no resumo
-    inputNome.addEventListener('input', updateSummary);
-</script>
 
-<script>
-    document.querySelectorAll('.time-btn').forEach(button => {
-    button.addEventListener('click', function () {
-        const dia = document.getElementById('inputDia').value;
-        const horario = this.getAttribute('data-horario');
 
-        // Atualiza o campo oculto com o horário selecionado
-        document.getElementById('inputHorario').value = horario;
-
-        // Faz uma requisição AJAX para verificar se o horário está disponível
-        fetch('verificar_agendamento.php', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: `dia=${dia}&horario=${horario}`
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.status === 'ocupado') {
-                alert('Este horário já está ocupado. Por favor, escolha outro horário.');
-                // Desmarcar o botão ativo
-                button.classList.remove('active');
-            } else {
-                // Marcar o botão como ativo se o horário estiver disponível
-                document.querySelectorAll('.time-btn').forEach(btn => btn.classList.remove('active'));
-                button.classList.add('active');
-                updateSummary(); // Atualiza o resumo do agendamento
-            }
-        })
-        .catch(error => console.error('Erro ao verificar agendamento:', error));
-    });
-});
 
 </script>
-
 
 </html>

@@ -7,38 +7,36 @@ $username = "u870367221_Barber";
 $password = "Deividlps120@";
 $dbname = "u870367221_Barber";
 
-// Cria a conexão com o banco de dados
-$conn = new mysqli($servername, $username, $password, $dbname);
-
-// Verifica a conexão
-if ($conn->connect_error) {
-    die("Conexão falhou: " . $conn->connect_error);
+try {
+    $conn = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $username, $password);
+    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch (PDOException $e) {
+    echo json_encode(['status' => 'erro', 'message' => $e->getMessage()]);
+    exit();
 }
 
-// Verifica se os parâmetros de data e horário foram recebidos
-if (isset($_POST['dia']) && isset($_POST['horario'])) {
-    $dia = $conn->real_escape_string($_POST['dia']);
-    $horario = $conn->real_escape_string($_POST['horario']);
+// Recebendo os dados do POST
+$dia = isset($_POST['dia']) ? $_POST['dia'] : '';
+$horario = isset($_POST['horario']) ? $_POST['horario'] : '';
 
-    // Prepara a consulta SQL para verificar se o agendamento já existe
-    $sql = "SELECT COUNT(*) as total FROM agendamentos WHERE dia = ? AND horario = ?";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("ss", $dia, $horario);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $row = $result->fetch_assoc();
-
-    // Verifica se há algum agendamento para o dia e horário informados
-    if ($row['total'] > 0) {
-        echo json_encode(['status' => 'ocupado']); // Retorna status 'ocupado' se já houver agendamento
-    } else {
-        echo json_encode(['status' => 'disponivel']); // Retorna 'disponivel' se o horário estiver livre
-    }
-
-    // Fecha a consulta
-    $stmt->close();
+// Validar os dados
+if (empty($dia) || empty($horario)) {
+    echo json_encode(['status' => 'erro', 'message' => 'Dados inválidos']);
+    exit();
 }
 
-// Fecha a conexão com o banco de dados
-$conn->close();
+// Verificar se o horário está ocupado
+$query = "SELECT COUNT(*) FROM agendamentos WHERE dia = :dia AND horario = :horario";
+$stmt = $conn->prepare($query);
+$stmt->bindParam(':dia', $dia);
+$stmt->bindParam(':horario', $horario);
+$stmt->execute();
+
+$resultado = $stmt->fetchColumn();
+
+if ($resultado > 0) {
+    echo json_encode(['status' => 'ocupado']);
+} else {
+    echo json_encode(['status' => 'disponivel']);
+}
 ?>
