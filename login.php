@@ -2,52 +2,47 @@
 // Configurações do banco de dados
 $servername = "srv1595.hstgr.io"; // Endereço do servidor MySQL
 $username = "u870367221_Barber";  // Nome de usuário do banco de dados
-$password = "Deividlps120@";       // Senha do banco de dados
-$dbname = "u870367221_Barber";     // Nome do banco de dados
+$password = "Deividlps120@";      // Senha do banco de dados
+$dbname = "u870367221_Barber";    // Nome do banco de dados
 
-// Cria a conexão
+// Criando a conexão
 $conn = new mysqli($servername, $username, $password, $dbname);
 
-// Verifica se houve erro na conexão
+// Verificando se há erros na conexão
 if ($conn->connect_error) {
-    die("Conexão falhou: " . $conn->connect_error);
+    die("Falha na conexão com o banco de dados: " . $conn->connect_error);
 }
 
-// Receber os dados do formulário e sanitizá-los
-$email = $conn->real_escape_string(trim($_POST['email'])); // Sanitiza a entrada do email
-$senha = $_POST['senha']; // Obtém a entrada da senha
+// Receber os dados do formulário
+$email = $_POST['email'];
+$senha = $_POST['senha'];
 
-// Preparar a consulta SQL para verificar o usuário
-$stmt = $conn->prepare("SELECT senha FROM usuarios WHERE email=?");
-$stmt->bind_param("s", $email); // Liga o parâmetro do email
-$stmt->execute(); // Executa a consulta
-$stmt->store_result(); // Armazena o resultado para verificações futuras
+// Sanitizar os dados (para evitar SQL injection)
+$email = $conn->real_escape_string($email);
 
-// Verificar se o usuário existe
-if ($stmt->num_rows > 0) {
-    // O usuário existe, agora recuperar a senha armazenada
-    $stmt->bind_result($senha_armazenada); // Liga o resultado à variável
-    $stmt->fetch(); // Obtém o resultado
+// Verificar se o usuário existe no banco de dados
+$sql = "SELECT * FROM usuarios WHERE email='$email'";
+$result = $conn->query($sql);
 
-    // Verificar a senha
-    if ($senha === $senha_armazenada) {
-        // Senha correta
-        session_start(); // Inicia a sessão
-        $_SESSION['usuarios'] = $email; // Armazena o email do usuário na sessão
-        header("Location: dashboard.php"); // Redireciona para uma página protegida
-        exit();
+if ($result->num_rows > 0) {
+    // O email foi encontrado
+    $user = $result->fetch_assoc();
+    
+    // Verificar se a senha está correta
+    if ($user['senha'] === $senha) {
+        // Senha correta, o login é bem-sucedido
+        echo "Login realizado com sucesso! Bem-vindo, " . $user['nome'] . ".";
+        
+        // Você pode redirecionar para outra página aqui usando header('Location: outra_pagina.php');
     } else {
         // Senha incorreta
-        echo "<script>alert('Senha incorreta!'); window.history.back();</script>";
-        exit();
+        echo "Senha incorreta!";
     }
 } else {
-    // Usuário não encontrado
-    echo "<script>alert('Este email não está cadastrado!'); window.history.back();</script>";
-    exit();
+    // Email não encontrado
+    echo "Email não encontrado!";
 }
 
 // Fechar a conexão
-$stmt->close(); // Fecha a declaração
-$conn->close(); // Fecha a conexão
+$conn->close();
 ?>
