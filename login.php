@@ -34,7 +34,7 @@ $result = $conn->query($sql);
     echo "Login realizado com sucesso! Bem-vindo, " . $user['nome'] . ".";
 
     // Redirecionar para a página de agendamento
-    header('Location: agendamento.php');
+    header('Location: index.php');
     exit(); // Sempre use exit() após o header para garantir que o script pare aqui
     } else {
     // Senha incorreta
