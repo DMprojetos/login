@@ -16,13 +16,16 @@
             --confirm-hover-color: #E0B000;
             --text-color: #ffffff;
             --info-bg-color: #2D2D2D;
+            --input-bg-color: #ffffff;
+            --input-border-color: #cccccc;
+            --input-focus-border-color: #FEC810;
         }
 
         .message {
-          font-size: 20px; /* Tamanho da fonte */
-          color: #FEC810; /* Cor do texto */
-          text-align: center; /* Centraliza o texto */
-          margin: 20px 0; /* Margem em cima e embaixo */
+            font-size: 20px; /* Tamanho da fonte */
+            color: #FEC810; /* Cor do texto */
+            text-align: center; /* Centraliza o texto */
+            margin: 20px 0; /* Margem em cima e embaixo */
         }
 
         * {
@@ -83,6 +86,22 @@
             margin-bottom: 20px;
         }
 
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid var(--input-border-color);
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+            background-color: var(--input-bg-color);
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: var(--input-focus-border-color);
+        }
+
         .time-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); /* Adapta os botões ao tamanho */
@@ -137,11 +156,26 @@
                 width: calc(50% - 5px); /* Reduzindo a largura em telas menores */
             }
         }
+        .nome {
+            background-color: var(--confirm-bg-color);
+            color: rgb(255, 255, 255);
+            border: none;
+            padding: 15px;
+            width: 100%;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <form action="config.php" method="POST" id="agendamentoForm">
+            <h2 class="nome">Nome</h2>
+            <input type="text" name="nome" id="inputNome" placeholder="Digite seu nome" required>
+
             <div class="days-selection" id="daysSelection"></div>
 
             <h2>Escolha o melhor horário</h2>
@@ -171,6 +205,7 @@
 
         <div class="summary" id="summary">
             <h3>Resumo do Agendamento:</h3>
+            <p>Nome: <span id="nomeSelecionado">Não informado</span></p>
             <p>Dia: <span id="diaSelecionado">02/10/2024</span></p>
             <p>Horário: <span id="horarioSelecionado">09:05</span></p>
         </div>
@@ -206,24 +241,23 @@
             }
             field.classList.add('active');
             const selectedValue = field.dataset.dia || field.dataset.horario;
-            document.getElementById('input' + value.charAt(0).toUpperCase() + value.slice(1)).value = selectedValue;
             document.getElementById(summaryId).textContent = selectedValue;
         }
 
-        // Atualiza o dia selecionado
-        document.querySelectorAll('.day').forEach(day => {
+        const dayElements = document.querySelectorAll('.day');
+        dayElements.forEach(day => {
             day.addEventListener('click', () => updateField('.day.active', day, 'dia', 'diaSelecionado'));
         });
 
-        // Atualiza o horário selecionado
-        document.querySelectorAll('.time-btn').forEach(timeBtn => {
-            timeBtn.addEventListener('click', () => {
-                document.querySelectorAll('.time-btn').forEach(btn => btn.classList.remove('active'));
-                timeBtn.classList.add('active');
-                const horarioValue = timeBtn.dataset.horario;
-                document.getElementById('inputHorario').value = horarioValue;
-                document.getElementById('horarioSelecionado').textContent = horarioValue;
-            });
+        const timeButtons = document.querySelectorAll('.time-btn');
+        timeButtons.forEach(timeBtn => {
+            timeBtn.addEventListener('click', () => updateField('.time-btn.active', timeBtn, 'horario', 'horarioSelecionado'));
+        });
+
+        // Atualiza o nome no resumo
+        const nomeInput = document.getElementById('inputNome');
+        nomeInput.addEventListener('input', () => {
+            document.getElementById('nomeSelecionado').textContent = nomeInput.value || 'Não informado';
         });
     </script>
 </body>
