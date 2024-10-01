@@ -158,6 +158,15 @@
                 /* Reduzindo a largura em telas menores */
             }
         }
+
+        .time-btn.indisponivel {
+            background-color: gray;
+            /* Cor de fundo para horários indisponíveis */
+            cursor: not-allowed;
+            /* Muda o cursor para indicar que não é clicável */
+            opacity: 0.6;
+            /* Um pouco de transparência para visualização */
+        }
     </style>
 </head>
 
@@ -211,10 +220,14 @@
     </div>
 
     <script>
+
         // Função para formatar a data
         function formatDate(date) {
-            const weekdays = ['dom', 'seg', 'ter', 'qua', 'qui', 'sex', 'sab'];
-            return weekdays[date.getDay()]; // Retorna a sigla do dia da semana
+            const weekdays = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab'];
+            const day = String(date.getDate()).padStart(2, '0'); // Obtém o dia e formata com dois dígitos
+            const month = String(date.getMonth() + 1).padStart(2, '0'); // Obtém o mês (de 0 a 11, então adiciona 1) e formata com dois dígitos
+            const weekday = weekdays[date.getDay()]; // Obtém a sigla do dia da semana
+            return `${day}/${month} - ${weekday}`; // Retorna a data formatada com a sigla do dia
         }
 
         // Gera os dias a partir da data atual, excluindo o domingo
@@ -228,7 +241,7 @@
             const formattedDate = formatDate(nextDate);
             const dayElement = document.createElement('div');
             dayElement.className = 'day';
-            dayElement.innerHTML = `<p>${formattedDate}</p>`; // Apenas a sigla do dia
+            dayElement.innerHTML = `<p>${formattedDate}</p>`; // Mostra a data formatada e a sigla do dia
             dayElement.setAttribute('data-date', nextDate.toISOString().split('T')[0]);
             dayElement.addEventListener('click', () => {
                 document.querySelectorAll('.day').forEach(d => d.classList.remove('active'));
@@ -238,6 +251,8 @@
             });
             daysSelection.appendChild(dayElement);
         }
+
+
 
 
 
@@ -257,7 +272,9 @@
         // Seleciona um horário
         timeButtons.forEach(button => {
             button.addEventListener('click', () => {
-                document.querySelectorAll('.time-btn').forEach(btn => btn.classList.remove('active'));
+                // Remove a classe active de todos os botões de horário
+                document.querySelectorAll('.time-btn:not(.barbeiro .time-btn)').forEach(btn => btn.classList.remove('active'));
+                // Adiciona a classe active apenas ao botão clicado
                 button.classList.add('active');
                 document.getElementById('inputHorario').value = button.getAttribute('data-horario');
                 updateSummary();
@@ -267,7 +284,9 @@
         // Seleciona um profissional
         document.querySelectorAll('.barbeiro .time-btn').forEach(button => {
             button.addEventListener('click', () => {
+                // Remove a classe active de todos os botões de profissional
                 document.querySelectorAll('.barbeiro .time-btn').forEach(btn => btn.classList.remove('active'));
+                // Adiciona a classe active apenas ao botão clicado
                 button.classList.add('active');
                 const profissional = button.getAttribute('data-profissional');
                 inputProfissional.value = profissional;
@@ -282,39 +301,39 @@
 
 <script>
 
-document.querySelectorAll('.time-btn').forEach(button => {
-    button.addEventListener('click', function () {
-        const dia = document.getElementById('inputDia').value;
-        const horario = this.getAttribute('data-horario');
-        const profissional = document.getElementById('inputProfissional').value; // Adicionando o profissional
+    document.querySelectorAll('.time-btn').forEach(button => {
+        button.addEventListener('click', function () {
+            const dia = document.getElementById('inputDia').value;
+            const horario = this.getAttribute('data-horario');
+            const profissional = document.getElementById('inputProfissional').value; // Adicionando o profissional
 
-        // Atualiza o campo oculto com o horário selecionado
-        document.getElementById('inputHorario').value = horario;
+            // Atualiza o campo oculto com o horário selecionado
+            document.getElementById('inputHorario').value = horario;
 
-        // Faz uma requisição AJAX para verificar se o horário está disponível
-        fetch('verificar_agendamento.php', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: `dia=${encodeURIComponent(dia)}&horario=${encodeURIComponent(horario)}&Profissional=${encodeURIComponent(profissional)}`
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.status === 'ocupado') {
-                alert('Este horário já está ocupado. Por favor, escolha outro horário.');
-                // Desmarcar o botão ativo
-                button.classList.remove('active');
-            } else {
-                // Marcar o botão como ativo se o horário estiver disponível
-                document.querySelectorAll('.time-btn').forEach(btn => btn.classList.remove('active'));
-                button.classList.add('active');
-                updateSummary(); // Atualiza o resumo do agendamento
-            }
-        })
-        .catch(error => console.error('Erro ao verificar agendamento:', error));
+            // Faz uma requisição AJAX para verificar se o horário está disponível
+            fetch('verificar_agendamento.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `dia=${encodeURIComponent(dia)}&horario=${encodeURIComponent(horario)}&Profissional=${encodeURIComponent(profissional)}`
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'ocupado') {
+                        alert('Este horário já está ocupado. Por favor, escolha outro horário.');
+                        // Desmarcar o botão ativo
+                        button.classList.remove('active');
+                    } else {
+                        // Marcar o botão como ativo se o horário estiver disponível
+                        document.querySelectorAll('.time-btn').forEach(btn => btn.classList.remove('active'));
+                        button.classList.add('active');
+                        updateSummary(); // Atualiza o resumo do agendamento
+                    }
+                })
+                .catch(error => console.error('Erro ao verificar agendamento:', error));
+        });
     });
-});
 
 
 

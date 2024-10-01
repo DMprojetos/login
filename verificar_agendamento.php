@@ -15,6 +15,7 @@ if ($conn->connect_error) {
     die("Conexão falhou: " . $conn->connect_error);
 }
 
+
 // Verifica se os parâmetros de data e horário foram recebidos
 // Verifica se os parâmetros de data e horário foram recebidos
 if (isset($_POST['dia']) && isset($_POST['horario'])) {

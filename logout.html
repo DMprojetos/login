@@ -21,16 +21,20 @@
             text-align: center; /* Centraliza o texto dentro do menu */
         }
         .image {
-            position: relative; /* Necessário para o menu suspenso */
             cursor: pointer;
-            text-align: center; /* Centraliza o texto dentro do menu */
+            display: block; /* Faz a imagem ocupar toda a largura do container */
+            margin: 0 auto; /* Centraliza a imagem */
+        }
+        .user-name1 {
+            color: black;
+            margin-top: 5px; /* Espaço entre a imagem e o nome */
         }
         .menu-content {
             display: none; /* Inicialmente oculto */
             position: absolute; /* Fica em relação ao menu do usuário */
             right: 0;
             top: 40px; /* Ajusta a posição do menu suspenso */
-            background-color: white; /* Fundo branco para o menu */
+            background-color: rgb(0, 0, 0); /* Fundo branco para o menu */
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Sombra para o menu */
             border-radius: 5px; /* Bordas arredondadas */
             z-index: 1000; /* Coloca o menu acima de outros elementos */
@@ -44,29 +48,29 @@
         .menu-content a:hover {
             background-color: #f0f0f0; /* Cor de fundo ao passar o mouse */
         }
-        .user-name1 {
-            color: black;
-            margin-right: 10px; /* Espaço entre o nome e a imagem */
-        }
     </style>
 </head>
 <body class="body1">
 
-    <div class="user-menu" onclick="toggleMenu()">
-        <span class="user-name1">Usuario</span>
+    <div class="user-menu" onclick="toggleMenu(event)"> <!-- Passando o evento -->
         <img class="image" src="https://img.icons8.com/ios/50/user.png" alt="User Profile" />
+        <span class="user-name1">Usuario</span>
         <div class="menu-content" id="menuContent">
             <a href="#" id="logoutButton">Log Out</a>
         </div>
     </div>
 
     <script>
-        function toggleMenu() {
+        function toggleMenu(event) {
             const menu = document.getElementById('menuContent');
             menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+
+            // Previne o clique no menu de fechar
+            event.stopPropagation();
         }
 
-        document.getElementById('logoutButton').addEventListener('click', function() {
+        document.getElementById('logoutButton').addEventListener('click', function(event) {
+            event.preventDefault(); // Previne o comportamento padrão do link
             alert('Logout realizado com sucesso!'); // Simulação de logout
             window.location.href = 'index-login.html'; // Certifique-se de que 'index-login.html' existe
         });
