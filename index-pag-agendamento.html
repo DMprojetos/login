@@ -79,7 +79,7 @@
         .info {
             font-size: 14px;
             background-color: var(--info-bg-color);
-            color: #cccccc;
+            color: #fff;
             padding: 10px;
             border-radius: 8px;
             margin-bottom: 20px;
@@ -146,10 +146,11 @@
         }
 
         .summary {
+            
             margin-top: 20px;
-            color: #000000;
+            color: #ffffff;
             padding: 10px;
-            border: 1px solid #000000;
+        
         }
 
         @media (max-width: 400px) {
@@ -184,7 +185,7 @@
                 <button type="button" class="time-btn" data-profissional="Gabriel">Gabriel</button>
             </div>
 
-            <h2>Escolha o melhor horário</h2>
+            <h2 class="info">Escolha o melhor horário</h2>
             <p class="info">Os agendamentos devem ser realizados com pelo menos 30 minutos de antecedência.</p>
 
             <div class="time-grid">
@@ -211,7 +212,7 @@
         </form>
 
         <div class="summary" id="summary">
-            <h3>Resumo do Agendamento:</h3>
+            <h3 class="summary">Resumo do Agendamento:</h3>
             <p>Nome: <span id="nomeSelecionado">Não informado</span></p>
             <p>Dia: <span id="diaSelecionado">02/10/2024</span></p>
             <p>Profissional: <span id="profissionalSelecionado">Não informado</span></p>
