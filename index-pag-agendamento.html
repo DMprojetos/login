@@ -139,6 +139,7 @@
             font-size: 16px;
             cursor: pointer;
             transition: background-color 0.3s;
+            margin-bottom: 20px;
         }
 
         .confirm-btn:hover {
@@ -146,11 +147,11 @@
         }
 
         .summary {
-            
+
             margin-top: 20px;
             color: #ffffff;
             padding: 10px;
-        
+
         }
 
         @media (max-width: 400px) {
@@ -208,16 +209,22 @@
             <input type="hidden" name="horario" id="inputHorario" value="09:05">
             <input type="hidden" name="Profissional" id="inputProfissional" value="">
 
+            <div class="summary" id="summary">
+                <h3 class="summary">Resumo do Agendamento:</h3>
+                <p>Nome: <span id="nomeSelecionado">Não informado</span></p>
+                <p>Dia: <span id="diaSelecionado">02/10/2024</span></p>
+                <p>Profissional: <span id="profissionalSelecionado">Não informado</span></p>
+                <p>Horário: <span id="horarioSelecionado">09:05</span></p>
+
+
+            </div>
+
             <button type="submit" class="confirm-btn">Confirmar agendamento</button>
+
         </form>
 
-        <div class="summary" id="summary">
-            <h3 class="summary">Resumo do Agendamento:</h3>
-            <p>Nome: <span id="nomeSelecionado">Não informado</span></p>
-            <p>Dia: <span id="diaSelecionado">02/10/2024</span></p>
-            <p>Profissional: <span id="profissionalSelecionado">Não informado</span></p>
-            <p>Horário: <span id="horarioSelecionado">09:05</span></p>
-        </div>
+
+
     </div>
 
     <script>
@@ -266,8 +273,18 @@
         function updateSummary() {
             document.getElementById('nomeSelecionado').innerText = inputNome.value || 'Não informado';
             document.getElementById('profissionalSelecionado').innerText = inputProfissional.value || 'Não informado';
-            document.getElementById('diaSelecionado').innerText = document.getElementById('inputDia').value || 'Não informado';
+            document.getElementById('diaSelecionado').innerText = formatarData(document.getElementById('inputDia').value) || 'Não informado';
             document.getElementById('horarioSelecionado').innerText = document.getElementById('inputHorario').value || 'Não informado';
+        }
+
+        function formatarData(data) {
+            if (!data) return ''; // Verifica se o valor da data está vazio
+
+            // Divide a string da data em ano, mês e dia
+            const [ano, mes, dia] = data.split('-');
+
+            // Retorna a data no formato dd/mm/yyyy
+            return `${dia}/${mes}/${ano}`;
         }
 
         // Seleciona um horário
