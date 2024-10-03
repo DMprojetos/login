@@ -1,0 +1,184 @@
+:root {
+    --bg-color: #fff;
+    --day-bg-color: #2D2D2D;
+    --active-day-color: #FEC810;
+    --time-bg-color: #2D2D2D;
+    --time-hover-color: #FEC810;
+    --confirm-bg-color: #FEC810;
+    --confirm-hover-color: #E0B000;
+    --text-color: #ffffff;
+    --info-bg-color: #2D2D2D;
+    --input-bg-color: #ffffff;
+    --input-border-color: #cccccc;
+    --input-focus-border-color: #FEC810;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+}
+
+.container {
+    width: 90%;
+    max-width: 400px;
+    margin: 50px auto;
+    text-align: center;
+}
+
+.days-selection {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    margin-bottom: 15px;
+    /* Diminuiu o espaço abaixo da seleção de dias */
+}
+
+.day {
+    background-color: var(--day-bg-color);
+    padding: 8px;
+    /* Diminuiu o padding interno */
+    border-radius: 10px;
+    width: calc(33.33% - 8px);
+    /* Ajustado para compensar o novo padding */
+    text-align: center;
+    cursor: pointer;
+    margin-bottom: 6px;
+    /* Diminuiu o espaçamento entre os dias */
+    transition: background-color 0.3s;
+}
+
+.day.active {
+    background-color: var(--active-day-color);
+}
+
+.day p {
+    margin: 2px 0;
+    /* Diminuiu a margem para os parágrafos dos dias */
+    font-size: 13px;
+}
+
+h2 {
+    margin: 15px 0;
+    /* Diminuiu o espaço entre os títulos */
+    font-size: 14px;
+}
+
+.info {
+    font-size: 14px;
+    background-color: var(--info-bg-color);
+    color: #fff;
+    padding: 10px;
+    /* Diminuiu o padding interno da info */
+    border-radius: 8px;
+    margin-bottom: 10;
+}
+
+input[type="text"] {
+    width: 100%;
+    padding: 8px;
+    /* Diminuiu o padding do input */
+    margin-bottom: 10px;
+    /* Diminuiu a margem inferior do input */
+    border: 1px solid var(--input-border-color);
+    border-radius: 8px;
+    font-size: 14px;
+    transition: border-color 0.3s;
+    background-color: var(--input-bg-color);
+}
+
+input[type="text"]:focus {
+    outline: none;
+    border-color: var(--input-focus-border-color);
+}
+
+.time-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+    gap: 6px;
+    /* Diminuiu o espaçamento entre os botões de horário */
+    margin-bottom: 12px;
+    /* Diminuiu o espaço abaixo da grade de horários */
+}
+
+.time-btn {
+    background-color: var(--time-bg-color);
+    color: white;
+    border: none;
+    padding: 14px;
+    /* Diminuiu o padding interno do botão */
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    font-size: 14px;
+}
+
+.time-btn.active {
+    background-color: var(--active-day-color);
+}
+
+.time-btn:hover {
+    background-color: var(--time-hover-color);
+}
+
+.confirm-btn {
+    background-color: var(--confirm-bg-color);
+    color: black;
+    border: none;
+    padding: 12px;
+    /* Diminuiu o padding do botão de confirmação */
+    width: 100%;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    margin-bottom: 16px;
+    /* Diminuiu a margem abaixo do botão de confirmação */
+}
+
+.confirm-btn:hover {
+    background-color: var(--confirm-hover-color);
+}
+
+.summary {
+    margin-top: 1px;
+    /* Diminuiu o espaço acima do resumo */
+    color: #000000;
+    padding: 8px;
+    /* Diminuiu o padding interno do resumo */
+}
+
+@media (max-width: 400px) {
+    .day {
+        width: calc(50% - 4px);
+        /* Ajustado para telas menores */
+    }
+}
+
+.time-btn.indisponivel {
+    background-color: gray;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.mensagem-indisponivel {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(255, 0, 0, 0.8);
+    /* Cor de fundo para destacar */
+    color: white;
+    padding: 20px;
+    border-radius: 8px;
+    font-size: 18px;
+    text-align: center;
+    z-index: 9999;
+    /* Para garantir que a mensagem fique no topo */
+}

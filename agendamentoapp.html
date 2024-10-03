@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agendamento</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        :root {
+            --bg-color: #fff;
+            --day-bg-color: #2D2D2D;
+            --active-day-color: #FEC810;
+            --time-bg-color: #2D2D2D;
+            --time-hover-color: #FEC810;
+            --confirm-bg-color: #FEC810;
+            --confirm-hover-color: #E0B000;
+            --text-color: #ffffff;
+            --info-bg-color: #2D2D2D;
+            --input-bg-color: #ffffff;
+            --input-border-color: #cccccc;
+            --input-focus-border-color: #FEC810;
+        }
+    
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+    
+        body {
+            font-family: 'Arial', sans-serif;
+            color: var(--text-color);
+            width: 100%;
+            max-width: 430px; /* Limite de largura */
+
+            margin: auto;
+            background: url("https://i.pinimg.com/564x/60/a1/a7/60a1a7c506764c9b9456cef28bc896d3.jpg") no-repeat center center fixed;
+            background-size: cover; /* Ajustar a imagem de fundo */
+        }
+    
+        .container {
+            width: 90%;
+            max-width: 400px;
+            margin: 10px auto;
+            text-align: center;
+            background: transparent;
+            border: 2px solid #7e7e7e;
+            backdrop-filter: blur(20px);
+            border-radius: 10px;
+            padding: 20px; /* Ajustado para menos padding */
+        }
+    
+        .days-selection {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+    
+        .day {
+            background-color: var(--day-bg-color);
+            padding: 8px;
+            border-radius: 10px;
+            width: calc(33.33% - 8px);
+            text-align: center;
+            cursor: pointer;
+            margin-bottom: 6px;
+            transition: background-color 0.3s;
+        }
+    
+        .day.active {
+            background-color: var(--active-day-color);
+        }
+    
+        .day p {
+            margin: 2px 0;
+            font-size: 13px;
+        }
+    
+        h2 {
+            margin: 15px 0;
+            font-size: 14px;
+        }
+    
+        .info {
+            font-size: 14px;
+            background-color: var(--info-bg-color);
+            color: #fff;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 10px; /* Adicionado px para garantir a margem */
+        }
+    
+        input[type="text"] {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid var(--input-border-color);
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+            background-color: var(--input-bg-color);
+        }
+    
+        input[type="text"]:focus {
+            outline: none;
+            border-color: var(--input-focus-border-color);
+        }
+    
+        .time-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+            gap: 6px;
+            margin-bottom: 12px;
+        }
+    
+        .time-btn {
+            background-color: var(--time-bg-color);
+            color: white;
+            border: none;
+            padding: 12px; /* Ajustado para menos padding */
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            font-size: 14px;
+        }
+    
+        .time-btn.active {
+            background-color: var(--active-day-color);
+        }
+    
+        .time-btn:hover {
+            background-color: var(--time-hover-color);
+        }
+    
+        .confirm-btn {
+            background-color: var(--confirm-bg-color);
+            color: black;
+            border: none;
+            padding: 12px; /* Ajustado para menos padding */
+            width: 100%;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-bottom: 16px;
+        }
+    
+        .confirm-btn:hover {
+            background-color: var(--confirm-hover-color);
+        }
+    
+        .summary {
+            margin-top: 1px;
+            color: #ffffff;
+            padding: 8px; /* Ajustado para menos padding */
+        }
+    
+        @media (max-width: 400px) {
+            .day {
+                width: calc(50% - 4px); /* Ajustado para telas menores */
+            }
+    
+            .container {
+                padding: 15px; /* Menos padding em telas menores */
+            }
+    
+            h2 {
+                font-size: 12px; /* Menor tamanho de fonte em telas pequenas */
+            }
+    
+            .info, .summary {
+                font-size: 12px; /* Ajustar tamanho de fonte */
+            }
+        }
+    
+        .time-btn.indisponivel {
+            background-color: gray;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+    
+        .mensagem-indisponivel {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(255, 0, 0, 0.8);
+            color: white;
+            padding: 50px;
+            border-radius: 8px;
+            font-size: 18px;
+            text-align: center;
+            z-index: 9999;
+        }
+    </style>
+    
+
+</head>
+
+<script>
+    // Função para verificar quais horários estão disponíveis ao carregar a página
+    function verificarHorariosIndisponiveis() {
+        const dia = document.getElementById('inputDia').value;
+        const profissional = document.getElementById('inputProfissional').value;
+
+        // Verifica se o nome foi digitado
+        const nome = document.getElementById('inputNome').value;
+        if (!nome) {
+            console.log('Nome não fornecido.');
+            return; // Sai da função se o nome não estiver preenchido
+        }
+
+        fetch('verificar_agendamentos.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: `dia=${encodeURIComponent(dia)}&Profissional=${encodeURIComponent(profissional)}`
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Erro na requisição');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.horariosIndisponiveis && Array.isArray(data.horariosIndisponiveis)) {
+                    document.querySelectorAll('.time-btn').forEach(button => {
+                        const horario = button.getAttribute('data-horario');
+                        if (data.horariosIndisponiveis.includes(horario)) {
+                            button.classList.add('disabled'); // Adiciona classe disabled
+                            button.disabled = true; // Desabilita o botão
+                        } else {
+                            button.classList.remove('disabled'); // Remove a classe se o horário estiver disponível
+                            button.disabled = false; // Habilita o botão
+                        }
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Erro ao verificar horários indisponíveis:', error);
+                alert('Ocorreu um erro ao verificar os horários. Por favor, tente novamente.');
+            });
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        verificarHorariosIndisponiveis();
+
+        // Adiciona evento para o campo de nome
+        const inputNome = document.getElementById('inputNome');
+        inputNome.addEventListener('input', verificarHorariosIndisponiveis);
+    });
+
+    document.querySelectorAll('.time-btn').forEach(button => {
+        button.addEventListener('click', function () {
+            // Impede a seleção se o botão estiver desabilitado
+            if (this.classList.contains('disabled')) {
+                return; // Sai da função se o botão estiver desabilitado
+            }
+
+            const dia = document.getElementById('inputDia').value;
+            const horario = this.getAttribute('data-horario');
+            const profissional = document.getElementById('inputProfissional').value;
+
+            document.getElementById('inputHorario').value = horario;
+
+            fetch('verificar_agendamento.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `dia=${encodeURIComponent(dia)}&horario=${encodeURIComponent(horario)}&Profissional=${encodeURIComponent(profissional)}`
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Erro na requisição');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    const mensagemIndisponivel = document.getElementById('mensagem-indisponivel');
+
+                    if (data.status === 'ocupado') {
+                        mensagemIndisponivel.style.display = 'block';
+                        setTimeout(() => {
+                            mensagemIndisponivel.style.display = 'none';
+                        }, 5000);
+                        button.classList.remove('active');
+                    } else {
+                        mensagemIndisponivel.style.display = 'none';
+                        document.querySelectorAll('.time-btn').forEach(btn => btn.classList.remove('active'));
+                        button.classList.add('active');
+                        updateSummary(); // Atualiza o resumo do agendamento
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro ao verificar agendamento:', error);
+                    alert('Ocorreu um erro ao verificar o agendamento. Por favor, tente novamente.');
+                });
+        });
+    });
+</script>
+
+
+<body>
+
+    <div class="container">
+        <form action="config.php" method="POST" id="agendamentoForm">
+            <h2 class="info">Nome</h2>
+            <input type="text" name="nome" id="inputNome" placeholder="Digite seu nome" required>
+
+            <div class="days-selection" id="daysSelection"></div>
+
+            <h2 class="info">Escolha o Profissional</h2>
+            <div class="barbeiro" id="barbeiro">
+                <button type="button" class="time-btn" data-profissional="Baiano">Baiano</button>
+                <button type="button" class="time-btn" data-profissional="Gabriel">Gabriel</button>
+            </div>
+
+            <h2 class="info">Escolha o melhor horário</h2>
+            <p class="info">Os agendamentos devem ser realizados com pelo menos 30 minutos de antecedência.</p>
+
+            <div class="time-grid">
+                <button type="button" class="time-btn" data-horario="09:00">09:00</button>
+                <button type="button" class="time-btn" data-horario="10:00">10:00</button>
+                <button type="button" class="time-btn" data-horario="11:00">11:00</button>
+                <button type="button" class="time-btn" data-horario="12:00">12:00</button>
+                <button type="button" class="time-btn" data-horario="12:30">12:30</button>
+                <button type="button" class="time-btn" data-horario="13:00">13:00</button>
+                <button type="button" class="time-btn" data-horario="13:30">13:30</button>
+                <button type="button" class="time-btn" data-horario="14:00">14:00</button>
+                <button type="button" class="time-btn" data-horario="15:00">15:00</button>
+                <button type="button" class="time-btn" data-horario="16:00">16:00</button>
+                <button type="button" class="time-btn" data-horario="17:00">17:00</button>
+                <button type="button" class="time-btn" data-horario="18:00">18:00</button>
+                <button type="button" class="time-btn" data-horario="19:00">19:00</button>
+            </div>
+
+            <input type="hidden" name="dia" id="inputDia" value="02/10/2024">
+            <input type="hidden" name="horario" id="inputHorario" value="09:05">
+            <input type="hidden" name="Profissional" id="inputProfissional" value="">
+
+            <div class="summary" id="summary">
+                <h3 class="summary">Resumo do Agendamento:</h3>
+                <p>Nome: <span id="nomeSelecionado">Não informado</span></p>
+                <p>Dia: <span id="diaSelecionado">02/10/2024</span></p>
+                <p>Profissional: <span id="profissionalSelecionado">Não informado</span></p>
+                <p>Horário: <span id="horarioSelecionado">09:05</span></p>
+
+
+            </div>
+
+            <button type="submit" class="confirm-btn">Confirmar agendamento</button>
+
+        </form>
+
+
+
+    </div>
+
+    <script>
+        // Função para verificar quais horários estão disponíveis ao carregar a página
+        function verificarHorariosIndisponiveis() {
+            const dia = document.getElementById('inputDia').value;
+            const profissional = document.getElementById('inputProfissional').value;
+
+            // Verifica se o nome foi digitado
+            const nome = document.getElementById('inputNome').value;
+            if (!nome) {
+                console.log('Nome não fornecido.');
+                return; // Sai da função se o nome não estiver preenchido
+            }
+
+            fetch('verificar_agendamentos.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `dia=${encodeURIComponent(dia)}&Profissional=${encodeURIComponent(profissional)}`
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Erro na requisição');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.horariosIndisponiveis && Array.isArray(data.horariosIndisponiveis)) {
+                        document.querySelectorAll('.time-btn').forEach(button => {
+                            const horario = button.getAttribute('data-horario');
+                            if (data.horariosIndisponiveis.includes(horario)) {
+                                button.classList.add('disabled');
+                            }
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro ao verificar horários indisponíveis:', error);
+                    alert('Ocorreu um erro ao verificar os horários. Por favor, tente novamente.');
+                });
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            verificarHorariosIndisponiveis();
+
+            // Adiciona evento para o campo de nome
+            const inputNome = document.getElementById('inputNome');
+            inputNome.addEventListener('input', verificarHorariosIndisponiveis);
+        });
+
+        document.querySelectorAll('.time-btn').forEach(button => {
+            button.addEventListener('click', function () {
+                const dia = document.getElementById('inputDia').value;
+                const horario = this.getAttribute('data-horario');
+                const profissional = document.getElementById('inputProfissional').value;
+
+                document.getElementById('inputHorario').value = horario;
+
+                fetch('verificar_agendamento.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: `dia=${encodeURIComponent(dia)}&horario=${encodeURIComponent(horario)}&Profissional=${encodeURIComponent(profissional)}`
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Erro na requisição');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        const mensagemIndisponivel = document.getElementById('mensagem-indisponivel');
+
+                        if (data.status === 'ocupado') {
+                            mensagemIndisponivel.style.display = 'block';
+                            setTimeout(() => {
+                                mensagemIndisponivel.style.display = 'none';
+                            }, 5000);
+                            button.classList.remove('active');
+                        } else {
+                            mensagemIndisponivel.style.display = 'none';
+                            document.querySelectorAll('.time-btn').forEach(btn => btn.classList.remove('active'));
+                            button.classList.add('active');
+                            updateSummary(); // Atualiza o resumo do agendamento
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Erro ao verificar agendamento:', error);
+                        alert('Ocorreu um erro ao verificar o agendamento. Por favor, tente novamente.');
+                    });
+            });
+        });
+
+    </script>
+
+    <script>
+
+        // Função para formatar a data
+        function formatDate(date) {
+            const weekdays = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab'];
+            const day = String(date.getDate()).padStart(2, '0'); // Obtém o dia e formata com dois dígitos
+            const month = String(date.getMonth() + 1).padStart(2, '0'); // Obtém o mês (de 0 a 11, então adiciona 1) e formata com dois dígitos
+            const weekday = weekdays[date.getDay()]; // Obtém a sigla do dia da semana
+            return `${day}/${month} - ${weekday}`; // Retorna a data formatada com a sigla do dia
+        }
+
+        // Gera os dias a partir da data atual, excluindo o domingo
+        const daysSelection = document.getElementById('daysSelection');
+        const today = new Date();
+
+        for (let i = 0; i < 7; i++) {
+            const nextDate = new Date(today);
+            nextDate.setDate(today.getDate() + i);
+            if (nextDate.getDay() === 0) continue; // Ignora o domingo
+            const formattedDate = formatDate(nextDate);
+            const dayElement = document.createElement('div');
+            dayElement.className = 'day';
+            dayElement.innerHTML = `<p>${formattedDate}</p>`; // Mostra a data formatada e a sigla do dia
+            dayElement.setAttribute('data-date', nextDate.toISOString().split('T')[0]);
+            dayElement.addEventListener('click', () => {
+                document.querySelectorAll('.day').forEach(d => d.classList.remove('active'));
+                dayElement.classList.add('active');
+                document.getElementById('inputDia').value = nextDate.toISOString().split('T')[0];
+                updateSummary();
+            });
+            daysSelection.appendChild(dayElement);
+        }
+
+
+
+
+
+        const timeButtons = document.querySelectorAll('.time-btn');
+        const summary = document.getElementById('summary');
+        const inputNome = document.getElementById('inputNome');
+        const inputProfissional = document.getElementById('inputProfissional');
+
+        // Atualiza o resumo do agendamento
+        function updateSummary() {
+            document.getElementById('nomeSelecionado').innerText = inputNome.value || 'Não informado';
+            document.getElementById('profissionalSelecionado').innerText = inputProfissional.value || 'Não informado';
+            document.getElementById('diaSelecionado').innerText = formatarData(document.getElementById('inputDia').value) || 'Não informado';
+            document.getElementById('horarioSelecionado').innerText = document.getElementById('inputHorario').value || 'Não informado';
+        }
+
+        function formatarData(data) {
+            if (!data) return ''; // Verifica se o valor da data está vazio
+
+            // Divide a string da data em ano, mês e dia
+            const [ano, mes, dia] = data.split('-');
+
+            // Retorna a data no formato dd/mm/yyyy
+            return `${dia}/${mes}/${ano}`;
+        }
+
+        // Seleciona um horário
+        timeButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                // Remove a classe active de todos os botões de horário
+                document.querySelectorAll('.time-btn:not(.barbeiro .time-btn)').forEach(btn => btn.classList.remove('active'));
+                // Adiciona a classe active apenas ao botão clicado
+                button.classList.add('active');
+                document.getElementById('inputHorario').value = button.getAttribute('data-horario');
+                updateSummary();
+            });
+        });
+
+        // Seleciona um profissional
+        document.querySelectorAll('.barbeiro .time-btn').forEach(button => {
+            button.addEventListener('click', () => {
+                // Remove a classe active de todos os botões de profissional
+                document.querySelectorAll('.barbeiro .time-btn').forEach(btn => btn.classList.remove('active'));
+                // Adiciona a classe active apenas ao botão clicado
+                button.classList.add('active');
+                const profissional = button.getAttribute('data-profissional');
+                inputProfissional.value = profissional;
+                document.getElementById('profissionalSelecionado').innerText = profissional;
+            });
+        });
+
+        // Atualiza o nome no resumo
+        inputNome.addEventListener('input', updateSummary);
+    </script>
+</body>
+
+
+<div id="mensagem-indisponivel" class="mensagem-indisponivel" style="display: none;">
+    Horário indisponivel. Escolha outro horário.
+</div>
+
+
+</html>

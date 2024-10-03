@@ -35,9 +35,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // Executa a inserção e verifica
     if ($stmt->execute()) {
-        echo "Agendamento realizado com sucesso!";
+        echo "<div style='text-align: center; font-size: 24px; margin-top: 20px; color: green;'>Agendamento realizado com sucesso!</div>";
     } else {
-        echo "Erro ao agendar: " . $stmt->error;
+        echo "<div style='text-align: center; font-size: 20px; margin-top: 20px; color: red;'>Erro ao agendar: " . $stmt->error . "</div>";
     }
 
     // Fecha a declaração e a conexão
