@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agendamento</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        :root {
+            --bg-color: #fff;
+            --day-bg-color: #2D2D2D;
+            --active-day-color: #FEC810;
+            --time-bg-color: #2D2D2D;
+            --time-hover-color: #FEC810;
+            --confirm-bg-color: #FEC810;
+            --confirm-hover-color: #E0B000;
+            --text-color: #ffffff;
+            --info-bg-color: #2D2D2D;
+            --input-bg-color: #ffffff;
+            --input-border-color: #cccccc;
+            --input-focus-border-color: #FEC810;
+        }
+    
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+    
+        body {
+            font-family: 'Arial', sans-serif;
+            color: var(--text-color);
+            width: 100%;
+            max-width: 430px; /* Limite de largura */
+
+            margin: auto;
+            background: url("https://i.pinimg.com/564x/60/a1/a7/60a1a7c506764c9b9456cef28bc896d3.jpg") no-repeat center center fixed;
+            background-size: cover; /* Ajustar a imagem de fundo */
+        }
+    
+        .container {
+            width: 90%;
+            max-width: 400px;
+            margin: 10px auto;
+            text-align: center;
+            background: transparent;
+            border: 2px solid #7e7e7e;
+            backdrop-filter: blur(20px);
+            border-radius: 10px;
+            padding: 20px; /* Ajustado para menos padding */
+        }
+    
+        .days-selection {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+    
+        .day {
+            background-color: var(--day-bg-color);
+            padding: 8px;
+            border-radius: 10px;
+            width: calc(33.33% - 8px);
+            text-align: center;
+            cursor: pointer;
+            margin-bottom: 6px;
+            transition: background-color 0.3s;
+        }
+    
+        .day.active {
+            background-color: var(--active-day-color);
+        }
+    
+        .day p {
+            margin: 2px 0;
+            font-size: 13px;
+        }
+    
+        h2 {
+            margin: 15px 0;
+            font-size: 14px;
+        }
+    
+        .info {
+            font-size: 14px;
+            background-color: var(--info-bg-color);
+            color: #fff;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 10px; /* Adicionado px para garantir a margem */
+        }
+    
+        input[type="text"] {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid var(--input-border-color);
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+            background-color: var(--input-bg-color);
+        }
+    
+        input[type="text"]:focus {
+            outline: none;
+            border-color: var(--input-focus-border-color);
+        }
+    
+        .time-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+            gap: 6px;
+            margin-bottom: 12px;
+        }
+    
+        .time-btn {
+            background-color: var(--time-bg-color);
+            color: white;
+            border: none;
+            padding: 12px; /* Ajustado para menos padding */
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            font-size: 14px;
+        }
+    
+        .time-btn.active {
+            background-color: var(--active-day-color);
+        }
+    
+        .time-btn:hover {
+            background-color: var(--time-hover-color);
+        }
+    
+        .confirm-btn {
+            background-color: var(--confirm-bg-color);
+            color: black;
+            border: none;
+            padding: 12px; /* Ajustado para menos padding */
+            width: 100%;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-bottom: 16px;
+        }
+    
+        .confirm-btn:hover {
+            background-color: var(--confirm-hover-color);
+        }
+    
+        .summary {
+            margin-top: 1px;
+            color: #ffffff;
+            padding: 8px; /* Ajustado para menos padding */
+        }
+    
+        @media (max-width: 400px) {
+            .day {
+                width: calc(50% - 4px); /* Ajustado para telas menores */
+            }
+    
+            .container {
+                padding: 15px; /* Menos padding em telas menores */
+            }
+    
+            h2 {
+                font-size: 12px; /* Menor tamanho de fonte em telas pequenas */
+            }
+    
+            .info, .summary {
+                font-size: 12px; /* Ajustar tamanho de fonte */
+            }
+        }
+    
+        .time-btn.indisponivel {
+            background-color: gray;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+    
+        .mensagem-indisponivel {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(255, 0, 0, 0.8);
+            color: white;
+            padding: 50px;
+            border-radius: 8px;
+            font-size: 18px;
+            text-align: center;
+            z-index: 9999;
+        }
+    </style>
+    
+
+</head>
+
+
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agendamento de Horários</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .button-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .hour-buttons {
+            margin-top: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="row justify-content-center align-items-center vh-100">
+            <div class="col-md-6 text-center">
+                <h1>Escolha um Profissional</h1>
+                <div class="button-container">
+                    <button id="baiano-btn" class="btn btn-primary mx-2">Baiano</button>
+                    <button id="gabriel-btn" class="btn btn-secondary mx-2">Gabriel</button>
+                </div>
+                <div id="hour-buttons" class="hour-buttons row gx-3 gy-3 mt-4"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('baiano-btn').addEventListener('click', function () {
+            fetchHours('Baiano');
+        });
+
+        document.getElementById('gabriel-btn').addEventListener('click', function () {
+            fetchHours('Gabriel');
+        });
+
+        function fetchHours(professional) {
+            const xhr = new XMLHttpRequest();
+            xhr.open("POST", "", true);
+            xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+            xhr.onload = function () {
+                if (xhr.status === 200) {
+                    const unavailableHours = JSON.parse(xhr.responseText);
+                    generateHourButtons(professional, unavailableHours);
+                }
+            };
+            xhr.send("professional=" + professional);
+        }
+
+        function generateHourButtons(person, unavailableHours) {
+            const hourButtonsContainer = document.getElementById('hour-buttons');
+            hourButtonsContainer.innerHTML = '';
+
+            // Array com os intervalos de horas comerciais do dia
+            const hours = [
+                '08:00', '09:00', '10:00', '11:00',
+                '13:00', '14:00', '15:00', '16:00', '17:00', '18:00'
+            ];
+
+            // Cria os botões de horário
+            hours.forEach(hour => {
+                const divCol = document.createElement('div');
+                divCol.className = 'col-4';
+
+                const button = document.createElement('button');
+                button.className = 'btn w-100';
+                button.textContent = `${hour} - ${person}`;
+
+                // Desabilitar botão se o horário estiver ocupado
+                if (unavailableHours.includes(hour)) {
+                    button.classList.add('btn-danger');
+                    button.disabled = true;
+                } else {
+                    button.classList.add('btn-outline-info');
+                }
+
+                divCol.appendChild(button);
+                hourButtonsContainer.appendChild(divCol);
+            });
+        }
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>
+
+
+<div id="mensagem-indisponivel" class="mensagem-indisponivel" style="display: none;">
+    Horário indisponivel. Escolha outro horário.
+</div>
+
+
+</html>

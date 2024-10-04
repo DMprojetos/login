@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agendamento de Horários</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .button-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .hour-buttons {
+            margin-top: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="row justify-content-center align-items-center vh-100">
+            <div class="col-md-6 text-center">
+                <h1>Escolha um Profissional</h1>
+                <div class="button-container">
+                    <button id="baiano-btn" class="btn btn-primary mx-2">Baiano</button>
+                    <button id="gabriel-btn" class="btn btn-secondary mx-2">Gabriel</button>
+                </div>
+                <div id="hour-buttons" class="hour-buttons row gx-3 gy-3 mt-4"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('baiano-btn').addEventListener('click', function () {
+            fetchHours('Baiano');
+        });
+
+        document.getElementById('gabriel-btn').addEventListener('click', function () {
+            fetchHours('Gabriel');
+        });
+
+        function fetchHours(professional) {
+            const xhr = new XMLHttpRequest();
+            xhr.open("POST", "", true);
+            xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+            xhr.onload = function () {
+                if (xhr.status === 200) {
+                    const unavailableHours = JSON.parse(xhr.responseText);
+                    generateHourButtons(professional, unavailableHours);
+                }
+            };
+            xhr.send("professional=" + professional);
+        }
+
+        function generateHourButtons(person, unavailableHours) {
+            const hourButtonsContainer = document.getElementById('hour-buttons');
+            hourButtonsContainer.innerHTML = '';
+
+            // Array com os intervalos de horas comerciais do dia
+            const hours = [
+                '08:00', '09:00', '10:00', '11:00',
+                '13:00', '14:00', '15:00', '16:00', '17:00', '18:00'
+            ];
+
+            // Cria os botões de horário
+            hours.forEach(hour => {
+                const divCol = document.createElement('div');
+                divCol.className = 'col-4';
+
+                const button = document.createElement('button');
+                button.className = 'btn w-100';
+                button.textContent = `${hour} - ${person}`;
+
+                // Desabilitar botão se o horário estiver ocupado
+                if (unavailableHours.includes(hour)) {
+                    button.classList.add('btn-danger');
+                    button.disabled = true;
+                } else {
+                    button.classList.add('btn-outline-info');
+                }
+
+                divCol.appendChild(button);
+                hourButtonsContainer.appendChild(divCol);
+            });
+        }
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>
