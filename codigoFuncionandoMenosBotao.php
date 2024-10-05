@@ -304,7 +304,7 @@ function generateHourButtons(person, unavailableHours) {
             // Adiciona o evento de clique para finalizar o agendamento
             button.addEventListener('click', function() {
                 // Define os valores dos campos antes de finalizar o agendamento
-                document.getElementById('inputNome').value = person; // Nome do profissional
+                document.getElementById('inputNome').value; // Nome do profissional
                 document.getElementById('inputDia').value = document.getElementById('inputDia').value; // Data selecionada
                 document.getElementById('inputProfissional').value = person; // Profissional selecionado
                 document.getElementById('inputHorario').value = hour; // Horário selecionado
