@@ -100,6 +100,12 @@
             color: var(--text-color);
         }
 
+        .btn:disabled {
+    background-color: #d3d3d3; /* Cor para botões desabilitados */
+    color: #a9a9a9; /* Texto cinza claro */
+    cursor: not-allowed; /* Cursor como proibido */
+}
+
         .btn-danger {
             background-color: #dc3545;
         }
@@ -294,6 +300,18 @@ function generateHourButtons(person, unavailableHours) {
             button.disabled = true; // Desabilita o botão
         } else {
             button.classList.add('btn-outline-info');
+
+            // Adiciona o evento de clique para finalizar o agendamento
+            button.addEventListener('click', function() {
+                // Define os valores dos campos antes de finalizar o agendamento
+                document.getElementById('inputNome').value = person; // Nome do profissional
+                document.getElementById('inputDia').value = document.getElementById('inputDia').value; // Data selecionada
+                document.getElementById('inputProfissional').value = person; // Profissional selecionado
+                document.getElementById('inputHorario').value = hour; // Horário selecionado
+
+                // Chama a função de finalização do agendamento
+                finalizeAppointment();
+            });
         }
 
         divCol.appendChild(button);
@@ -301,35 +319,31 @@ function generateHourButtons(person, unavailableHours) {
     });
 }
 
-// Adiciona evento de mudança ao seletor de data
-document.getElementById('date-selector').addEventListener('change', function() {
-    const selectedDate = this.value; // Obtém a data selecionada
-    const professional = document.getElementById('professional-selector').value; // Obtém o profissional selecionado
+function finalizeAppointment() {
+    const nome = document.getElementById('inputNome').value;
+    const dia = document.getElementById('inputDia').value;
+    const profissional = document.getElementById('inputProfissional').value;
+    const horario = document.getElementById('inputHorario').value;
 
-    fetchHours(professional, selectedDate); // Chama a função com o profissional e a data
-});
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", "config.php", true); // Apontando para o arquivo PHP para finalização
+    xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+    xhr.onload = function () {
+        if (xhr.status === 200) {
+            alert("Agendamento realizado com sucesso!");
+            // Aqui você pode adicionar lógica para limpar os campos ou ocultar o container
+            document.getElementById('inputNome').value = ''; // Limpa o campo nome
+            document.getElementById('inputDia').value = ''; // Limpa o campo dia
+            document.getElementById('inputProfissional').value = ''; // Limpa o campo profissional
+            document.getElementById('inputHorario').value = ''; // Limpa o campo horário
+            document.getElementById('hour-buttons').innerHTML = ''; // Limpa os botões de horário
+        } else {
+            alert("Ocorreu um erro ao agendar. Tente novamente.");
+        }
+    };
+    xhr.send(`nome=${encodeURIComponent(nome)}&dia=${encodeURIComponent(dia)}&profissional=${encodeURIComponent(profissional)}&horario=${encodeURIComponent(horario)}`);
+}
 
-
-
-    function finalizeAppointment() {
-        const nome = document.getElementById('inputNome').value;
-        const dia = document.getElementById('inputDia').value;
-        const profissional = document.getElementById('inputProfissional').value;
-        const horario = document.getElementById('inputHorario').value;
-
-        const xhr = new XMLHttpRequest();
-        xhr.open("POST", "config.php", true); // Apontando para o novo arquivo PHP para finalização
-        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-        xhr.onload = function () {
-            if (xhr.status === 200) {
-                alert("Agendamento realizado com sucesso!");
-                // Aqui você pode adicionar lógica para limpar os campos ou ocultar o container
-            } else {
-                alert("Ocorreu um erro ao agendar. Tente novamente.");
-            }
-        };
-        xhr.send(`nome=${encodeURIComponent(nome)}&dia=${encodeURIComponent(dia)}&profissional=${encodeURIComponent(profissional)}&horario=${encodeURIComponent(horario)}`);
-    }
 </script>
 
 </body>
