@@ -296,10 +296,10 @@ function generateHourButtons(person, unavailableHours) {
 
         // Desabilitar botão se o horário estiver ocupado
         if (unavailableHours.includes(hour)) {
-            button.classList.add('btn-danger');
+            button.classList.add('btn:disabled');
             button.disabled = true; // Desabilita o botão
         } else {
-            button.classList.add('btn-outline-info');
+            button.classList.add('hour-buttons');
 
             // Adiciona o evento de clique para finalizar o agendamento
             button.addEventListener('click', function() {

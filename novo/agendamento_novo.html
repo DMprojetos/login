@@ -100,6 +100,15 @@
             color: var(--text-color);
         }
 
+        .btn:disabled {
+            background-color: #d3d3d3;
+            /* Cor para botões desabilitados */
+            color: #a9a9a9;
+            /* Texto cinza claro */
+            cursor: not-allowed;
+            /* Cursor como proibido */
+        }
+
         .btn-danger {
             background-color: #dc3545;
         }
@@ -136,18 +145,20 @@
             outline: none;
             border-color: var(--input-focus-border-color);
         }
+
         .btn:hover {
-    background-color: var(--time-hover-color);
-    transition: background-color 0.3s;
-}
+            background-color: var(--time-hover-color);
+            transition: background-color 0.3s;
+        }
 
-.day:hover {
-    background-color: var(--time-hover-color);
-}
+        .day:hover {
+            background-color: var(--time-hover-color);
+        }
 
-.button-container button:hover {
-    background-color: #007bff; /* Cor primária do Bootstrap */
-}
+        .button-container button:hover {
+            background-color: #007bff;
+            /* Cor primária do Bootstrap */
+        }
 
 
         @media (max-width: 400px) {
@@ -172,156 +183,174 @@
 
 <body>
     <div class="container mt-5">
-            <h2 class="info">Nome</h2>
-            <input type="text" name="nome" id="inputNome" placeholder="Digite seu nome" required>
-            <button type="button" id="prosseguir-btn" class="btn btn-primary mt-2">Prosseguir</button>
+        <h2 class="info">Nome</h2>
+        <input type="text" name="nome" id="inputNome" placeholder="Digite seu nome" required>
+        <button type="button" id="prosseguir-btn" class="btn btn-primary mt-2">Prosseguir</button>
 
-            <div id="days-container" class="hidden">
-                <h1 class="info">Agendamento de Horários</h1>
-                <div class="days-selection" id="daysSelection"></div>
+        <div id="days-container" class="hidden">
+            <h1 class="info">Agendamento de Horários</h1>
+            <div class="days-selection" id="daysSelection"></div>
+        </div>
+
+        <input type="hidden" name="dia" id="inputDia" value="">
+        <input type="hidden" name="nome" id="inputNome" value="">
+        <input type="hidden" name="horario" id="inputHorario" value="09:05">
+        <input type="hidden" name="Profissional" id="inputProfissional" value="">
+
+        <div id="professionals-container" class="hidden">
+            <h1>Escolha o Profissional</h1>
+            <div class="button-container">
+                <button type="button" id="baiano-btn" class="btn btn-primary">Baiano</button>
+                <button type="button" id="gabriel-btn" class="btn btn-primary">Gabriel</button>
             </div>
-
-            <input type="hidden" name="dia" id="inputDia" value="">
-            <input type="hidden" name="horario" id="inputHorario" value="09:05">
-            <input type="hidden" name="Profissional" id="inputProfissional" value="">
-
-            <div id="professionals-container" class="hidden">
-                <h1>Escolha o Profissional</h1>
-                <div class="button-container">
-                    <button type="button" id="baiano-btn" class="btn btn-primary">Baiano</button>
-                    <button type="button" id="gabriel-btn" class="btn btn-primary">Gabriel</button>
-                </div>
-                <div id="hour-buttons" class="hour-buttons mt-3"></div>
-            </div>
+            <div id="hour-buttons" class="hour-buttons mt-3"></div>
+        </div>
         </form>
     </div>
 
-<script>
-    function formatDate(date) {
-        const weekdays = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab'];
-        const day = String(date.getDate()).padStart(2, '0');
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const weekday = weekdays[date.getDay()];
-        return `${day}/${month} - ${weekday}`;
-    }
-
-    const daysSelection = document.getElementById('daysSelection');
-    const today = new Date();
-
-    document.getElementById('prosseguir-btn').addEventListener('click', function () {
-        const inputNome = document.getElementById('inputNome').value;
-        if (inputNome) {
-            document.getElementById('days-container').classList.remove('hidden');
-            daysSelection.innerHTML = '';
-
-            for (let i = 0; i < 7; i++) {
-                const nextDate = new Date(today);
-                nextDate.setDate(today.getDate() + i);
-                if (nextDate.getDay() === 0) continue; // Ignora o domingo
-                const formattedDate = formatDate(nextDate);
-
-                const dayButton = document.createElement('button');
-                dayButton.className = 'btn btn-secondary day mx-1';
-                dayButton.innerHTML = formattedDate;
-                dayButton.setAttribute('data-date', nextDate.toISOString().split('T')[0]);
-
-                dayButton.addEventListener('click', function () {
-                    document.querySelectorAll('.day').forEach(d => d.classList.remove('active'));
-                    this.classList.add('active');
-                    document.getElementById('inputDia').value = this.getAttribute('data-date');
-                    showProfessionals(); // Carrega os profissionais ao escolher a data
-                });
-
-                daysSelection.appendChild(dayButton);
-            }
-        } else {
-            alert("Por favor, digite seu nome.");
+    <script>
+        function formatDate(date) {
+            const weekdays = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab'];
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const weekday = weekdays[date.getDay()];
+            return `${day}/${month} - ${weekday}`;
         }
-    });
 
-    function showProfessionals() {
-        document.getElementById('professionals-container').classList.remove('hidden');
-        const selectedDate = document.getElementById('inputDia').value;
-        console.log("Data selecionada: ", selectedDate);
-        // Aqui você pode exibir os profissionais disponíveis, ex: adicionando botões para cada profissional
-        document.getElementById('baiano-btn').style.display = 'block'; // Exibir botões de profissionais
-        document.getElementById('gabriel-btn').style.display = 'block';
-    }
+        const daysSelection = document.getElementById('daysSelection');
+        const today = new Date();
 
-    document.getElementById('baiano-btn').addEventListener('click', function () {
-        fetchHours('Baiano');
-    });
+        document.getElementById('prosseguir-btn').addEventListener('click', function () {
+            const inputNome = document.getElementById('inputNome').value;
+            if (inputNome) {
+                document.getElementById('days-container').classList.remove('hidden');
+                daysSelection.innerHTML = '';
 
-    document.getElementById('gabriel-btn').addEventListener('click', function () {
-        fetchHours('Gabriel');
-    });
+                for (let i = 0; i < 7; i++) {
+                    const nextDate = new Date(today);
+                    nextDate.setDate(today.getDate() + i);
+                    if (nextDate.getDay() === 0) continue; // Ignora o domingo
+                    const formattedDate = formatDate(nextDate);
 
-    function fetchHours(professional) {
-        const dia = document.getElementById('inputDia').value;
-        const xhr = new XMLHttpRequest();
-        xhr.open("POST", "fetch_hours.php", true); // Apontando para o novo arquivo PHP
-        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-        xhr.onload = function () {
-            if (xhr.status === 200) {
-                const unavailableHours = JSON.parse(xhr.responseText);
-                generateHourButtons(unavailableHours);
-                document.getElementById('inputProfissional').value = professional;
-            }
-        };
-        xhr.send(`profissional=${professional}&dia=${dia}`);
-    }
+                    const dayButton = document.createElement('button');
+                    dayButton.className = 'btn btn-secondary day mx-1';
+                    dayButton.innerHTML = formattedDate;
+                    dayButton.setAttribute('data-date', nextDate.toISOString().split('T')[0]);
 
-    function generateHourButtons(unavailableHours) {
-        const hourButtonsContainer = document.getElementById('hour-buttons');
-        hourButtonsContainer.innerHTML = ''; // Limpa os botões de horas existentes
+                    dayButton.addEventListener('click', function () {
+                        document.querySelectorAll('.day').forEach(d => d.classList.remove('active'));
+                        this.classList.add('active');
+                        document.getElementById('inputDia').value = this.getAttribute('data-date');
+                        showProfessionals(); // Carrega os profissionais ao escolher a data
+                    });
 
-        // Todos os horários disponíveis
-        const allHours = ['09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00'];
-
-        // Extraímos os horários indisponíveis do array retornado
-        const occupiedHours = unavailableHours.map(item => item.horario);
-
-        allHours.forEach(function (hour) {
-            // Verifica se o horário está ocupado. Se sim, não cria o botão
-            if (!occupiedHours.includes(hour)) {
-                const hourButton = document.createElement('button');
-                hourButton.className = 'btn btn-primary col-4';
-                hourButton.innerHTML = hour;
-
-                hourButton.addEventListener('click', function () {
-                    document.getElementById('inputHorario').value = hour;
-                    hourButtonsContainer.querySelectorAll('.btn').forEach(btn => btn.classList.remove('btn-outline-info'));
-                    this.classList.add('btn-outline-info');
-
-                    // Finaliza o agendamento após selecionar o horário
-                    finalizeAppointment();
-                });
-
-                hourButtonsContainer.appendChild(hourButton);
+                    daysSelection.appendChild(dayButton);
+                }
+            } else {
+                alert("Por favor, digite seu nome.");
             }
         });
-    }
 
-    function finalizeAppointment() {
-        const nome = document.getElementById('inputNome').value;
-        const dia = document.getElementById('inputDia').value;
-        const profissional = document.getElementById('inputProfissional').value;
-        const horario = document.getElementById('inputHorario').value;
+        function showProfessionals() {
+            document.getElementById('professionals-container').classList.remove('hidden');
+            const selectedDate = document.getElementById('inputDia').value;
+            console.log("Data selecionada: ", selectedDate);
+            // Aqui você pode exibir os profissionais disponíveis, ex: adicionando botões para cada profissional
+            document.getElementById('baiano-btn').style.display = 'block'; // Exibir botões de profissionais
+            document.getElementById('gabriel-btn').style.display = 'block';
+        }
 
-        const xhr = new XMLHttpRequest();
-        xhr.open("POST", "config.php", true); // Apontando para o novo arquivo PHP para finalização
-        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-        xhr.onload = function () {
-            if (xhr.status === 200) {
-                alert("Agendamento realizado com sucesso!");
-                // Aqui você pode adicionar lógica para limpar os campos ou ocultar o container
-            } else {
-                alert("Ocorreu um erro ao agendar. Tente novamente.");
-            }
-        };
-        xhr.send(`nome=${encodeURIComponent(nome)}&dia=${encodeURIComponent(dia)}&profissional=${encodeURIComponent(profissional)}&horario=${encodeURIComponent(horario)}`);
-    }
-</script>
+        document.getElementById('baiano-btn').addEventListener('click', function () {
+            fetchHours('Baiano');
+        });
+
+        document.getElementById('gabriel-btn').addEventListener('click', function () {
+            fetchHours('Gabriel');
+        });
+
+        function fetchHours(professional, selectedDate) {
+            const xhr = new XMLHttpRequest();
+            xhr.open("POST", "verificar_agendamento.php", true); // Certifique-se de que a URL está correta
+            xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+            xhr.onload = function () {
+                if (xhr.status === 200) {
+                    const unavailableHours = JSON.parse(xhr.responseText);
+                    generateHourButtons(professional, unavailableHours);
+                }
+            };
+            xhr.send("professional=" + encodeURIComponent(professional) + "&date=" + encodeURIComponent(selectedDate)); // Envia o dia selecionado
+        }
+
+        function generateHourButtons(person, unavailableHours) {
+            const hourButtonsContainer = document.getElementById('hour-buttons');
+            hourButtonsContainer.innerHTML = '';
+
+            // Array com os intervalos de horas comerciais do dia
+            const hours = [
+                '08:00', '09:00', '10:00', '11:00',
+                '13:00', '14:00', '15:00', '16:00', '17:00', '18:00'
+            ];
+
+            // Cria os botões de horário
+            hours.forEach(hour => {
+                const divCol = document.createElement('div');
+                divCol.className = 'col-4';
+
+                const button = document.createElement('button');
+                button.className = 'btn w-100';
+                button.textContent = `${hour} - ${person}`;
+
+                // Desabilitar botão se o horário estiver ocupado
+                if (unavailableHours.includes(hour)) {
+                    button.classList.add('btn:disabled');
+                    button.disabled = true; // Desabilita o botão
+                } else {
+                    button.classList.add('hour-buttons');
+
+                    // Adiciona o evento de clique para finalizar o agendamento
+                    button.addEventListener('click', function () {
+                        // Define os valores dos campos antes de finalizar o agendamento
+                        document.getElementById('inputNome').value; // Nome do profissional
+                        document.getElementById('inputDia').value = document.getElementById('inputDia').value; // Data selecionada
+                        document.getElementById('inputProfissional').value = person; // Profissional selecionado
+                        document.getElementById('inputHorario').value = hour; // Horário selecionado
+
+                        // Chama a função de finalização do agendamento
+                        finalizeAppointment();
+                    });
+                }
+
+                divCol.appendChild(button);
+                hourButtonsContainer.appendChild(divCol);
+            });
+        }
+
+        function finalizeAppointment() {
+            const nome = document.getElementById('inputNome').value;
+            const dia = document.getElementById('inputDia').value;
+            const profissional = document.getElementById('inputProfissional').value;
+            const horario = document.getElementById('inputHorario').value;
+
+            const xhr = new XMLHttpRequest();
+            xhr.open("POST", "config.php", true); // Apontando para o arquivo PHP para finalização
+            xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+            xhr.onload = function () {
+                if (xhr.status === 200) {
+                    alert("Agendamento realizado com sucesso!");
+                    // Aqui você pode adicionar lógica para limpar os campos ou ocultar o container
+                    document.getElementById('inputNome').value = ''; // Limpa o campo nome
+                    document.getElementById('inputDia').value = ''; // Limpa o campo dia
+                    document.getElementById('inputProfissional').value = ''; // Limpa o campo profissional
+                    document.getElementById('inputHorario').value = ''; // Limpa o campo horário
+                    document.getElementById('hour-buttons').innerHTML = ''; // Limpa os botões de horário
+                } else {
+                    alert("Ocorreu um erro ao agendar. Tente novamente.");
+                }
+            };
+            xhr.send(`nome=${encodeURIComponent(nome)}&dia=${encodeURIComponent(dia)}&profissional=${encodeURIComponent(profissional)}&horario=${encodeURIComponent(horario)}`);
+        }
+
+    </script>
 
 </body>
 
