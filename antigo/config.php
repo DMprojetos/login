@@ -18,20 +18,26 @@ if ($conn->connect_error) {
 // Verifica se os dados foram enviados
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Obtém os dados do formulário
-    $nome = isset($_POST['nome']) ? $_POST['nome'] : ''; // Capturando o nome
-    $dia = isset($_POST['dia']) ? $_POST['dia'] : '';
-    $horario = isset($_POST['horario']) ? $_POST['horario'] : '';
-    $profissional = isset($_POST['Profissional']) ? $_POST['Profissional'] : '';
+    $nome = trim($_POST['nome']); // Capturando o nome
+    $dia = trim($_POST['dia']);
+    $horario = trim($_POST['horario']);
+    $profissional = trim($_POST['Profissional']);
 
     // Verifica se os campos estão vazios
     if (empty($nome) || empty($dia) || empty($horario) || empty($profissional)) {
-        echo "Todos os campos são obrigatórios!";
+        echo "<div style='text-align: center; font-size: 20px; margin-top: 20px; color: red;'>Todos os campos são obrigatórios!</div>";
         exit;
     }
 
     // Prepara a instrução SQL
     $stmt = $conn->prepare("INSERT INTO agendamentos (nome, dia, horario, profissional) VALUES (?, ?, ?, ?)");
-    $profissional = isset($_POST['Profissional']) ? $_POST['Profissional'] : '';
+    if ($stmt === false) {
+        echo "<div style='text-align: center; font-size: 20px; margin-top: 20px; color: red;'>Erro ao preparar a declaração: " . $conn->error . "</div>";
+        exit;
+    }
+
+    // Vincula os parâmetros
+    $stmt->bind_param("ssss", $nome, $dia, $horario, $profissional);
 
     // Executa a inserção e verifica
     if ($stmt->execute()) {
@@ -44,5 +50,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stmt->close();
 }
 
+// Fecha a conexão
 $conn->close();
 ?>

@@ -199,107 +199,359 @@
 
 </head>
 
+<script>
+    // Função para verificar quais horários estão disponíveis ao carregar a página
+    function verificarHorariosIndisponiveis() {
+        const dia = document.getElementById('inputDia').value;
+        const profissional = document.getElementById('inputProfissional').value;
 
-<!DOCTYPE html>
-<html lang="pt-br">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Agendamento de Horários</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        .button-container {
-            display: flex;
-            justify-content: center;
-            margin-top: 20px;
+        // Verifica se o nome foi digitado
+        const nome = document.getElementById('inputNome').value;
+        if (!nome) {
+            console.log('Nome não fornecido.');
+            return; // Sai da função se o nome não estiver preenchido
         }
 
-        .hour-buttons {
-            margin-top: 20px;
-            text-align: center;
-        }
-    </style>
-</head>
+        fetch('verificar_agendamentos.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: `dia=${encodeURIComponent(dia)}&Profissional=${encodeURIComponent(profissional)}`
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Erro na requisição');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.horariosIndisponiveis && Array.isArray(data.horariosIndisponiveis)) {
+                    document.querySelectorAll('.time-btn').forEach(button => {
+                        const horario = button.getAttribute('data-horario');
+                        if (data.horariosIndisponiveis.includes(horario)) {
+                            button.classList.add('disabled'); // Adiciona classe disabled
+                            button.disabled = true; // Desabilita o botão
+                        } else {
+                            button.classList.remove('disabled'); // Remove a classe se o horário estiver disponível
+                            button.disabled = false; // Habilita o botão
+                        }
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Erro ao verificar horários indisponíveis:', error);
+                alert('Ocorreu um erro ao verificar os horários. Por favor, tente novamente.');
+            });
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        verificarHorariosIndisponiveis();
+
+        // Adiciona evento para o campo de nome
+        const inputNome = document.getElementById('inputNome');
+        inputNome.addEventListener('input', verificarHorariosIndisponiveis);
+    });
+
+    document.querySelectorAll('.time-btn').forEach(button => {
+        button.addEventListener('click', function () {
+            // Impede a seleção se o botão estiver desabilitado
+            if (this.classList.contains('disabled')) {
+                return; // Sai da função se o botão estiver desabilitado
+            }
+
+            const dia = document.getElementById('inputDia').value;
+            const horario = this.getAttribute('data-horario');
+            const profissional = document.getElementById('inputProfissional').value;
+
+            document.getElementById('inputHorario').value = horario;
+
+            fetch('verificar_agendamento.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `dia=${encodeURIComponent(dia)}&horario=${encodeURIComponent(horario)}&Profissional=${encodeURIComponent(profissional)}`
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Erro na requisição');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    const mensagemIndisponivel = document.getElementById('mensagem-indisponivel');
+
+                    if (data.status === 'ocupado') {
+                        mensagemIndisponivel.style.display = 'block';
+                        setTimeout(() => {
+                            mensagemIndisponivel.style.display = 'none';
+                        }, 5000);
+                        button.classList.remove('active');
+                    } else {
+                        mensagemIndisponivel.style.display = 'none';
+                        document.querySelectorAll('.time-btn').forEach(btn => btn.classList.remove('active'));
+                        button.classList.add('active');
+                        updateSummary(); // Atualiza o resumo do agendamento
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro ao verificar agendamento:', error);
+                    alert('Ocorreu um erro ao verificar o agendamento. Por favor, tente novamente.');
+                });
+        });
+    });
+</script>
+
 
 <body>
+
     <div class="container">
-        <div class="row justify-content-center align-items-center vh-100">
-            <div class="col-md-6 text-center">
-                <h1>Escolha um Profissional</h1>
-                <div class="button-container">
-                    <button id="baiano-btn" class="btn btn-primary mx-2">Baiano</button>
-                    <button id="gabriel-btn" class="btn btn-secondary mx-2">Gabriel</button>
-                </div>
-                <div id="hour-buttons" class="hour-buttons row gx-3 gy-3 mt-4"></div>
+        <form action="config.php" method="POST" id="agendamentoForm">
+            <h2 class="info">Nome</h2>
+            <input type="text" name="nome" id="inputNome" placeholder="Digite seu nome" required>
+
+            <div class="days-selection" id="daysSelection"></div>
+
+            <h2 class="info">Escolha o Profissional</h2>
+            <div class="barbeiro" id="barbeiro">
+                <button type="button" class="time-btn" data-profissional="Baiano">Baiano</button>
+                <button type="button" class="time-btn" data-profissional="Gabriel">Gabriel</button>
             </div>
-        </div>
+
+            <h2 class="info">Escolha o melhor horário</h2>
+            <div class="time-grid">
+                <button type="button" class="time-btn" data-horario="09:00">09:00</button>
+                <button type="button" class="time-btn" data-horario="10:00">10:00</button>
+                <button type="button" class="time-btn" data-horario="11:00">11:00</button>
+                <button type="button" class="time-btn" data-horario="12:00">12:00</button>
+                <button type="button" class="time-btn" data-horario="12:30">12:30</button>
+                <button type="button" class="time-btn" data-horario="13:00">13:00</button>
+                <button type="button" class="time-btn" data-horario="13:30">13:30</button>
+                <button type="button" class="time-btn" data-horario="14:00">14:00</button>
+                <button type="button" class="time-btn" data-horario="15:00">15:00</button>
+                <button type="button" class="time-btn" data-horario="16:00">16:00</button>
+                <button type="button" class="time-btn" data-horario="17:00">17:00</button>
+                <button type="button" class="time-btn" data-horario="18:00">18:00</button>
+                <button type="button" class="time-btn" data-horario="19:00">19:00</button>
+            </div>
+
+            <input type="hidden" name="dia" id="inputDia" value="02/10/2024">
+            <input type="hidden" name="horario" id="inputHorario" value="09:05">
+            <input type="hidden" name="Profissional" id="inputProfissional" value="">
+
+            <div class="summary" id="summary">
+                <h3 class="summary">Resumo do Agendamento:</h3>
+                <p>Nome: <span id="nomeSelecionado">Não informado</span></p>
+                <p>Dia: <span id="diaSelecionado">02/10/2024</span></p>
+                <p>Profissional: <span id="profissionalSelecionado">Não informado</span></p>
+                <p>Horário: <span id="horarioSelecionado">09:05</span></p>
+
+
+            </div>
+
+            <button type="submit" class="confirm-btn">Confirmar agendamento</button>
+
+        </form>
+
+
+
     </div>
 
+   
     <script>
-        document.getElementById('baiano-btn').addEventListener('click', function () {
-            fetchHours('Baiano');
-        });
 
-        document.getElementById('gabriel-btn').addEventListener('click', function () {
-            fetchHours('Gabriel');
-        });
-
-        function fetchHours(professional) {
-            const xhr = new XMLHttpRequest();
-            xhr.open("POST", "", true);
-            xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-            xhr.onload = function () {
-                if (xhr.status === 200) {
-                    const unavailableHours = JSON.parse(xhr.responseText);
-                    generateHourButtons(professional, unavailableHours);
-                }
-            };
-            xhr.send("professional=" + professional);
+        // Função para formatar a data
+        function formatDate(date) {
+            const weekdays = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab'];
+            const day = String(date.getDate()).padStart(2, '0'); // Obtém o dia e formata com dois dígitos
+            const month = String(date.getMonth() + 1).padStart(2, '0'); // Obtém o mês (de 0 a 11, então adiciona 1) e formata com dois dígitos
+            const weekday = weekdays[date.getDay()]; // Obtém a sigla do dia da semana
+            return `${day}/${month} - ${weekday}`; // Retorna a data formatada com a sigla do dia
         }
 
-        function generateHourButtons(person, unavailableHours) {
-            const hourButtonsContainer = document.getElementById('hour-buttons');
-            hourButtonsContainer.innerHTML = '';
+        // Gera os dias a partir da data atual, excluindo o domingo
+        const daysSelection = document.getElementById('daysSelection');
+        const today = new Date();
 
-            // Array com os intervalos de horas comerciais do dia
-            const hours = [
-                '08:00', '09:00', '10:00', '11:00',
-                '13:00', '14:00', '15:00', '16:00', '17:00', '18:00'
-            ];
-
-            // Cria os botões de horário
-            hours.forEach(hour => {
-                const divCol = document.createElement('div');
-                divCol.className = 'col-4';
-
-                const button = document.createElement('button');
-                button.className = 'btn w-100';
-                button.textContent = `${hour} - ${person}`;
-
-                // Desabilitar botão se o horário estiver ocupado
-                if (unavailableHours.includes(hour)) {
-                    button.classList.add('btn-danger');
-                    button.disabled = true;
-                } else {
-                    button.classList.add('btn-outline-info');
-                }
-
-                divCol.appendChild(button);
-                hourButtonsContainer.appendChild(divCol);
+        for (let i = 0; i < 7; i++) {
+            const nextDate = new Date(today);
+            nextDate.setDate(today.getDate() + i);
+            if (nextDate.getDay() === 0) continue; // Ignora o domingo
+            const formattedDate = formatDate(nextDate);
+            const dayElement = document.createElement('div');
+            dayElement.className = 'day';
+            dayElement.innerHTML = `<p>${formattedDate}</p>`; // Mostra a data formatada e a sigla do dia
+            dayElement.setAttribute('data-date', nextDate.toISOString().split('T')[0]);
+            dayElement.addEventListener('click', () => {
+                document.querySelectorAll('.day').forEach(d => d.classList.remove('active'));
+                dayElement.classList.add('active');
+                document.getElementById('inputDia').value = nextDate.toISOString().split('T')[0];
+                updateSummary();
             });
+            daysSelection.appendChild(dayElement);
         }
+
+
+
+
+
+        const timeButtons = document.querySelectorAll('.time-btn');
+        const summary = document.getElementById('summary');
+        const inputNome = document.getElementById('inputNome');
+        const inputProfissional = document.getElementById('inputProfissional');
+
+        // Atualiza o resumo do agendamento
+        function updateSummary() {
+            document.getElementById('nomeSelecionado').innerText = inputNome.value || 'Não informado';
+            document.getElementById('profissionalSelecionado').innerText = inputProfissional.value || 'Não informado';
+            document.getElementById('diaSelecionado').innerText = formatarData(document.getElementById('inputDia').value) || 'Não informado';
+            document.getElementById('horarioSelecionado').innerText = document.getElementById('inputHorario').value || 'Não informado';
+        }
+
+        function formatarData(data) {
+            if (!data) return ''; // Verifica se o valor da data está vazio
+
+            // Divide a string da data em ano, mês e dia
+            const [ano, mes, dia] = data.split('-');
+
+            // Retorna a data no formato dd/mm/yyyy
+            return `${dia}/${mes}/${ano}`;
+        }
+
+        // Seleciona um horário
+        timeButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                // Remove a classe active de todos os botões de horário
+                document.querySelectorAll('.time-btn:not(.barbeiro .time-btn)').forEach(btn => btn.classList.remove('active'));
+                // Adiciona a classe active apenas ao botão clicado
+                button.classList.add('active');
+                document.getElementById('inputHorario').value = button.getAttribute('data-horario');
+                updateSummary();
+            });
+        });
+
+        // Seleciona um profissional
+        document.querySelectorAll('.barbeiro .time-btn').forEach(button => {
+            button.addEventListener('click', () => {
+                // Remove a classe active de todos os botões de profissional
+                document.querySelectorAll('.barbeiro .time-btn').forEach(btn => btn.classList.remove('active'));
+                // Adiciona a classe active apenas ao botão clicado
+                button.classList.add('active');
+                const profissional = button.getAttribute('data-profissional');
+                inputProfissional.value = profissional;
+                document.getElementById('profissionalSelecionado').innerText = profissional;
+            });
+        });
+
+        // Atualiza o nome no resumo
+        inputNome.addEventListener('input', updateSummary);
     </script>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
-
-</html>
 
 
 <div id="mensagem-indisponivel" class="mensagem-indisponivel" style="display: none;">
-    Horário indisponivel. Escolha outro horário.
+    Horário já agendado. Escolha outro horário ou troque o profissional.
 </div>
+
+
+
+<script>
+    // Função para verificar quais horários estão disponíveis ao carregar a página
+    function verificarHorariosIndisponiveis() {
+        const dia = document.getElementById('inputDia').value;
+        const profissional = document.getElementById('inputProfissional').value;
+
+        // Verifica se o nome foi digitado
+        const nome = document.getElementById('inputNome').value;
+        if (!nome) {
+            console.log('Nome não fornecido.');
+            return; // Sai da função se o nome não estiver preenchido
+        }
+
+        fetch('verificar_agendamentos.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: `dia=${encodeURIComponent(dia)}&Profissional=${encodeURIComponent(profissional)}`
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Erro na requisição');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.horariosIndisponiveis && Array.isArray(data.horariosIndisponiveis)) {
+                    document.querySelectorAll('.time-btn').forEach(button => {
+                        const horario = button.getAttribute('data-horario');
+                        if (data.horariosIndisponiveis.includes(horario)) {
+                            button.classList.add('disabled');
+                        }
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Erro ao verificar horários indisponíveis:', error);
+                alert('Ocorreu um erro ao verificar os horários. Por favor, tente novamente.');
+            });
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        verificarHorariosIndisponiveis();
+
+        // Adiciona evento para o campo de nome
+        const inputNome = document.getElementById('inputNome');
+        inputNome.addEventListener('input', verificarHorariosIndisponiveis);
+    });
+
+    document.querySelectorAll('.time-btn').forEach(button => {
+        button.addEventListener('click', function () {
+            const dia = document.getElementById('inputDia').value;
+            const horario = this.getAttribute('data-horario');
+            const profissional = document.getElementById('inputProfissional').value;
+
+            document.getElementById('inputHorario').value = horario;
+
+            fetch('verificar_agendamento.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `dia=${encodeURIComponent(dia)}&horario=${encodeURIComponent(horario)}&Profissional=${encodeURIComponent(profissional)}`
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Erro na requisição');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    const mensagemIndisponivel = document.getElementById('mensagem-indisponivel');
+
+                    if (data.status === 'ocupado') {
+                        mensagemIndisponivel.style.display = 'block';
+                        setTimeout(() => {
+                            mensagemIndisponivel.style.display = 'none';
+                        }, 5000);
+                        button.classList.remove('active');
+                    } else {
+                        mensagemIndisponivel.style.display = 'none';
+                        document.querySelectorAll('.time-btn').forEach(btn => btn.classList.remove('active'));
+                        button.classList.add('active');
+                        updateSummary(); // Atualiza o resumo do agendamento
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro ao verificar agendamento:', error);
+                    alert('Ocorreu um erro ao verificar o agendamento. Por favor, tente novamente.');
+                });
+        });
+    });
+
+</script>
+
 
 
 </html>

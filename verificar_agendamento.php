@@ -18,26 +18,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Recebe o profissional via POST
     $professional = $_POST['professional'];
+    $day = $_POST['dia'];  // Recebendo o dia via POST
+
 
     // Consulta os horários ocupados para o profissional
-    $sql = "SELECT horario FROM dados WHERE profissional = ?";
+    $sql = "SELECT horario FROM agendamentos WHERE profissional = ?";
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("s", $professional);
+    $stmt->bind_param("ss", $professional, $day);
     $stmt->execute();
     $result = $stmt->get_result();
 
-    $unavailableHours = [];
+    $unavailableAppointments = [];
     while ($row = $result->fetch_assoc()) {
-        $unavailableHours[] = $row['horario'];
+        // Adiciona um objeto com profissional, horário e dia ao array
+        $unavailableAppointments[] = [
+            'profissional' => $row['profissional'],
+            'horario' => $row['horario'],
+            'dia' => $row['dia']
+        ];
     }
 
     // Retorna os horários ocupados em formato JSON
-    echo json_encode($unavailableHours);
+    echo json_encode($unavailableAppointments);
 
     $stmt->close();
     $conn->close();
     exit;
 }
 ?>
-
-
