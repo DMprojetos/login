@@ -258,7 +258,7 @@
 
     function fetchHours(professional, selectedDate) {
     const xhr = new XMLHttpRequest();
-    xhr.open("POST", "", true); // Certifique-se de que a URL está correta
+    xhr.open("POST", "verificar_agendamento.php", true); // Certifique-se de que a URL está correta
     xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
     xhr.onload = function () {
         if (xhr.status === 200) {

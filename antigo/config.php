@@ -15,39 +15,29 @@ if ($conn->connect_error) {
     die("Conexão falhou: " . $conn->connect_error);
 }
 
-// Verifica se os dados foram enviados
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Obtém os dados do formulário
-    $nome = trim($_POST['nome']); // Capturando o nome
-    $dia = trim($_POST['dia']);
-    $horario = trim($_POST['horario']);
-    $profissional = trim($_POST['Profissional']);
+// Recebe os dados do POST
+$nome = $_POST['nome'] ?? '';
+$dia = $_POST['dia'] ?? '';
+$profissional = $_POST['profissional'] ?? '';
+$horario = $_POST['horario'] ?? '';
 
-    // Verifica se os campos estão vazios
-    if (empty($nome) || empty($dia) || empty($horario) || empty($profissional)) {
-        echo "<div style='text-align: center; font-size: 20px; margin-top: 20px; color: red;'>Todos os campos são obrigatórios!</div>";
-        exit;
-    }
+// Valida os dados
+if ($nome && $dia && $profissional && $horario) {
+    // Prepara e vincula
+    $stmt = $conn->prepare("INSERT INTO agendamentos (nome, dia, profissional, horario) VALUES (?, ?, ?, ?)");
+    $stmt->bind_param("ssss", $nome, $dia, $profissional, $horario);
 
-    // Prepara a instrução SQL
-    $stmt = $conn->prepare("INSERT INTO agendamentos (nome, dia, horario, profissional) VALUES (?, ?, ?, ?)");
-    if ($stmt === false) {
-        echo "<div style='text-align: center; font-size: 20px; margin-top: 20px; color: red;'>Erro ao preparar a declaração: " . $conn->error . "</div>";
-        exit;
-    }
-
-    // Vincula os parâmetros
-    $stmt->bind_param("ssss", $nome, $dia, $horario, $profissional);
-
-    // Executa a inserção e verifica
+    // Tenta executar
     if ($stmt->execute()) {
-        echo "<div style='text-align: center; font-size: 24px; margin-top: 20px; color: green;'>Agendamento realizado com sucesso!</div>";
+        echo "Agendamento realizado com sucesso!";
     } else {
-        echo "<div style='text-align: center; font-size: 20px; margin-top: 20px; color: red;'>Erro ao agendar: " . $stmt->error . "</div>";
+        echo "Erro ao agendar: " . $stmt->error;
     }
 
-    // Fecha a declaração e a conexão
+    // Fecha a declaração
     $stmt->close();
+} else {
+    echo "Todos os campos são obrigatórios.";
 }
 
 // Fecha a conexão

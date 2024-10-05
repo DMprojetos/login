@@ -36,9 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'horario' => $row['horario'],
             'dia' => $row['dia']
         ];
-    }
-
-    // Retorna os horários ocupados em formato JSON
+    
     echo json_encode($unavailableAppointments);
 
     $stmt->close();
