@@ -22,7 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 
     // Consulta os horários ocupados para o profissional
-    $sql = "SELECT horario FROM agendamentos WHERE profissional = ?";
+    $sql = "SELECT profissional, horario, dia FROM agendamentos WHERE profissional = ? AND dia = ?";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("ss", $professional, $day);
     $stmt->execute();
